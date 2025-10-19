@@ -6,13 +6,20 @@
     min-height: 100vh; /*Fulscreen*/
     background: linear-gradient(180deg, #F3EBFF 0%, #FFFFFF 100%);
     padding: 40px 20px;
+<<<<<<< HEAD
     justify-content: center;
+=======
+>>>>>>> 8a0beeb736eb29186c98188842ddc4ba98432455
 }
 
 /*Logo section*/
 .logo-section{
     text-align: center;
+<<<<<<< HEAD
     margin-bottom: 60px;
+=======
+    margin-bottom: 40px;
+>>>>>>> 8a0beeb736eb29186c98188842ddc4ba98432455
 }
 
 .logo-circle{
@@ -84,6 +91,10 @@
     cursor: pointer;
     width:100%;
     height: 50px;
+<<<<<<< HEAD
+=======
+    max-width: 350px;
+>>>>>>> 8a0beeb736eb29186c98188842ddc4ba98432455
     margin-bottom: 16px;;
 }
 
@@ -102,4 +113,12 @@
     color:#8B5FBF;
     font-weight: 500;
     cursor: pointer;
+<<<<<<< HEAD
+=======
+}
+
+.content-section{
+    text-align: center;
+    max-width: 350px;
+>>>>>>> 8a0beeb736eb29186c98188842ddc4ba98432455
 }
