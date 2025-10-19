@@ -1,0 +1,167 @@
+.signup-container{
+    min-height: 100vh;
+    background: linear-gradient(180deg, #F3EBFF 0%, #FFFFFF 100%);
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-card{
+    background:white;
+    border-radius: 20px;
+    padding: 40px 32px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 400px;
+}
+
+.signup-header{
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.signup-title{
+    font-family: 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 600; 
+    color: #2D2D2D; 
+    margin: 0 0 8PX 0;
+}
+
+.signup-subtitle{
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600; 
+    color: #6B6B6B; 
+    margin: 0;
+}
+
+.signup-form{
+    margin-bottom: 24px;
+}
+
+.input-group{
+    margin-bottom: 16px;
+}
+
+.form-input{
+    width: 100%;
+    height: 50px;
+    padding: 0 16px;
+    border: 1.5px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 0 16px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus{
+    outline:none;
+    border-color:#8B5FBF;
+}
+
+.signup-button{
+    width: 100%;
+    height: 52px;
+    background-color: #8B5FBF;
+    color: white;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.signup-button:hover{
+    background-color: #7A4FAD;
+}
+
+.divider{
+    text-align: center;
+    margin: 32px 0;
+    position: relative;
+    color: #6B6B6B;
+    font-size: 14px;
+}
+
+.divider::before{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #E8E8E8;
+    z-index: 1;
+}
+
+.divider span{
+    background: white;
+    padding: 0 16px;
+    position: relative;
+    z-index: 2;
+}
+
+.social-signup{
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.social-button{
+    width: 100%;
+    height: 48px;
+    background-color: white;
+    border: 1.5px solid #E8E8E8;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.social-button:hover{
+    border-color: #8B5FBF;
+}
+
+.social-icon{
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.google .social-icon{
+    color: #4285F4;
+}
+
+.apple .social-icon{
+    color: #000000;
+}
+
+.facebook .social-icon{
+    color: #1877F2;
+}
+
+.login-link{
+    font-family: 'Inter',sans-serif;
+    font-size: 14px;
+    color:#6B6B6B;
+    text-align: center;
+    margin: 0;
+}
+
+.login-link span{
+    color:#8B5FBF;
+    font-weight: 600;
+    cursor: pointer;
+}
+
