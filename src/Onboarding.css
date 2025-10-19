@@ -1,94 +1,130 @@
-/*Main container styles*/
 .onboarding-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh; /*Fulscreen*/
+    min-height: 100vh;
     background: linear-gradient(180deg, #F3EBFF 0%, #FFFFFF 100%);
     padding: 40px 20px;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
-/*Logo section*/
 .logo-section{
     text-align: center;
-    margin-bottom: 60px;
+    margin-top: 60px;
+    margin-bottom: 50px;
 }
 
 .logo-circle{
-    width: 80px;
-    height: 80px;
-    background-color: #8B5FBF; /*Primary purple*/
+    width: 120px;
+    height: 120px;
+    background-color: #A06FC7;
     border-radius: 50%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     margin: 0 auto 16px;
+    box-shadow: 0 5px 20px rgba(160, 111, 199, 0.3);
 }
 
-.hand-wave{
-    font-size: 32px;
-}
-
-.app-title{
+.logo-title {
     font-family: 'Inter', sans-serif;
-    font-size: 32px;
-    font-weight: 600; /*Semi-bold*/
-    color: #2D2D2D; /*Dark gray*/
-    margin: 0 0 8PX 0;
+    font-size: 16px;
+    font-weight: 600; 
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.heart-icon{
+    font-size: 40px;
+    color: #FFFFFF;
+    line-height: 1;
+    margin-top: 5px;
 }
 
 .app-tagline{
     font-family: 'Inter', sans-serif;
     font-size: 16px;
-    color: #6B6B6B; /*Medium gray*/
+    color: #6B6B6B;
     margin: 0;
 }
 
-/*Content section*/
+.illustration-section{
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 80px;
+}
+
+.icon-line{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+}
+
+.line{
+    flex-grow: 1;
+    height: 2px;
+    background: #A06FC7;
+    margin: 0 -10px;
+}
+
+.icon{
+    font-size: 32px;
+    padding: 0 10px;
+    z-index: 10;
+}
+
+.chart-icon {
+    color: #A06FC7;
+    transform: rotate(270deg) scaleX(-1);
+}
+
+.handshake-icon {
+    font-size: 40px;
+    color: #2D2D2D;
+}
+
+.sparkle-icon {
+    color: #FFD700;
+    font-size: 28px;
+}
+
 .content-section{
     text-align: center;
     max-width: 350px;
-}
-
-.illustration{
-    margin-bottom: 32px;
-}
-
-.aura-blob{
-    width:200px;
-    height:120px;
-    background-color: #F3EBFF; /*Light purple*/
-    border-radius: 50%;
-    margin: 0 auto;
-    opacity: 0.7
+    width: 100%;
 }
 
 .onboarding-text{
     font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    color: #6B6B6B;
-    margin-bottom: 32px;
-    line-height: 1.5; /*Improved readability*/
+    font-size: 18px;
+    font-weight: 500;
+    color: #2D2D2D;
+    margin-bottom: 40px;
+    line-height: 1.4; 
+    padding: 0 20px;
 }
 
-/*Main button*/
 .cta-button{
-    background-color: #8B5FBF; /*Primary purple*/
+    background-color: #A06FC7; 
     color: #FFFFFF;
     font-family: 'Inter', sans-serif;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    width:100%;
-    height: 50px;
-    margin-bottom: 16px;;
+    width: 100%;
+    max-width: 300px;
+    height: 52px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(160, 111, 199, 0.5); 
 }
 
 .cta-button:hover{
-    background-color: #7A4FAD;
+    background-color: #8B5FBF;
 }
 
 .login-link{
@@ -96,10 +132,6 @@
     font-size: 14px;
     color:#6B6B6B;
     margin:0;
-}
-
-.login-link span{
-    color:#8B5FBF;
-    font-weight: 500;
     cursor: pointer;
+    text-decoration: underline;
 }
