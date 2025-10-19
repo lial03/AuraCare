@@ -135,11 +135,7 @@
 }
 
 .social-icon{
-<<<<<<< HEAD
     font-weight: bold;
-=======
-    font-family: bold;
->>>>>>> 8a0beeb736eb29186c98188842ddc4ba98432455
     font-size: 16px;
 }
 
@@ -151,11 +147,7 @@
     color: #000000;
 }
 
-<<<<<<< HEAD
 .facebook .social-icon{
-=======
-.facbook .social-icon{
->>>>>>> 8a0beeb736eb29186c98188842ddc4ba98432455
     color: #1877F2;
 }
 
@@ -172,4 +164,3 @@
     font-weight: 600;
     cursor: pointer;
 }
-
