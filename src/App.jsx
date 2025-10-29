@@ -2,10 +2,11 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import Dashboard from './Dashboard';
 import Login from './Login';
+import MoodLog from './MoodLog';
 import Onboarding from './Onboarding';
 import SignUp from './SignUp';
 
-function App(){
+function App() {
   return (
     <Router>
       <div className='App'>
@@ -14,6 +15,7 @@ function App(){
           <Route path='/signup' element={<SignUp />} />
           <Route path='/login' element={<Login />} />
           <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/mood-log' element={<MoodLog />} />
         </Routes>
       </div>
     </Router>

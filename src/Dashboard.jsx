@@ -17,7 +17,6 @@ const Dashboard=() =>{
                 </div>
             </div>
 
-            {/* Insight Card 1: This Week's Insight */}
             <div className="insights-card insights-card-1">
                 <p className="insights-content">
                     <span className="insights-icon">📈</span> This Week's Insight<br/>
@@ -26,7 +25,6 @@ const Dashboard=() =>{
                 </p>
             </div>
 
-            {/* Insight Card 2: Your Pattern */}
             <div className="insights-card insights-card-2">
                 <p className="insights-content">
                     <span className="insights-icon">🎯</span> Your Pattern: Mood dips around 3 PM. Try a 5-minute break!

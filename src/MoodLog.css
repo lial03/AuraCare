@@ -1,0 +1,152 @@
+.mood-log-container {
+    min-height: 100vh;
+    background: #F3EBFF;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.log-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.back-arrow {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2D2D2D;
+    cursor: pointer;
+    margin-right: 16px;
+}
+
+.log-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2D2D2D;
+    margin: 0;
+}
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    background-color: #A06FC7; 
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.section-prompt {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6B6B6B;
+    margin-bottom: 16px;
+}
+
+.mood-selection-section {
+    margin-bottom: 40px;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.mood-grid {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.mood-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 5px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background-color 0.2s;
+}
+
+.mood-option:hover {
+    background-color: #f3ebff;
+}
+
+.mood-icon {
+    font-size: 36px;
+    margin-bottom: 4px;
+}
+
+.mood-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2D2D2D;
+}
+
+.notes-section {
+    margin-bottom: 40px;
+}
+
+.mood-notes-textarea {
+    width: 100%;
+    padding: 16px;
+    border: 1.5px solid #E0E0E0;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    resize: none;
+    box-shadow: inset 0 2px 5px rgba(160, 111, 199, 0.1);
+    transition: border-color 0.2s;
+}
+
+.mood-notes-textarea:focus {
+    outline: none;
+    border-color: #A06FC7;
+}
+
+.action-button-group {
+    text-align: center;
+}
+
+.log-mood-button {
+    width: 100%;
+    max-width: 300px;
+    height: 52px;
+    background-color: #A06FC7;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 8px 20px rgba(160, 111, 199, 0.5);
+}
+
+.log-mood-button:hover {
+    background-color: #8B5FBF;
+}
+
+.mood-option.selected {
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+.mood-option.selected .mood-icon {
+    transform: scale(1.1);
+}
