@@ -1,64 +1,84 @@
+import { useNavigate } from 'react-router-dom';
 import './SignUp.css';
 
 const SignUp = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="signup-container">
-            <div className="logo-section">
-                <div className="logo-circle">
-                    <h1 className="logo-title">AuraCare</h1>
-                    <span className="heart-icon">🤍</span>
-                </div>
+        <div className="signup-card">
+            <div className="signup-header">
+            <h1 className="signup-title">Sign Up</h1>
+            <p className="signup-subtitle">Create your safe space</p>
             </div>
 
-            <div className="signup-card">
-                <div className="tab-navigation">
-                    <div className="tab log-in-tab">Log In</div>
-                    <div className="tab sign-up-tab active">Sign Up</div>
-                </div>
-                
-                <div className="signup-form">
-                    <div className="input-group">
-                        <input 
-                        type="text" 
-                        placeholder="Full Name"
-                        className="form-input"
-                        />
-                    </div>
-
-                    <div className="input-group">
-                        <input 
-                        type="email" 
-                        placeholder="Email"
-                        className="form-input"
-                        />
-                    </div>
-
-                    <div className="input-group">
-                        <input 
-                        type="tel" 
-                        placeholder="Phone Number"
-                        className="form-input"
-                        />
-                    </div>
-
-                    <div className="input-group input-with-icon">
-                        <input 
-                        type="password" 
-                        placeholder="Create password"
-                        className="form-input password-input" 
-                        />
-                        <span className="input-icon">👁️</span> 
-                    </div>
-
-                    <button className="signup-button">
-                        Create My Safe Space
-                    </button>
-                </div>
-
-                <p className="login-link bottom-link">
-                    Already have an account? <span className="log-in-link-text">Log In</span>
-                </p>
+            <div className="signup-form">
+            <div className="input-group">
+                <input 
+                type="text" 
+                placeholder="Full name"
+                className="form-input"
+                />
             </div>
+
+            <div className="input-group">
+                <input 
+                type="email" 
+                placeholder="Email address"
+                className="form-input"
+                />
+            </div>
+
+            <div className="input-group">
+                <input 
+                type="tel" 
+                placeholder="Phone number"
+                className="form-input"
+                />
+            </div>
+
+            <div className="input-group">
+                <input 
+                type="password" 
+                placeholder="Create password"
+                className="form-input"
+                />
+            </div>
+
+            <button 
+                className="signup-button"
+                onClick={() => navigate('/dashboard')}
+            >
+                Create Account
+            </button>
+            </div>
+
+            <div className="divider">
+            <span>or</span>
+            </div>
+
+            <div className="social-signup">
+            <button className="social-button google">
+                <span className="social-icon">G</span>
+                Continue with Google
+            </button>
+            
+            <button className="social-button apple">
+                <span className="social-icon">A</span>
+                Continue with Apple
+            </button>
+            
+            <button className="social-button facebook">
+                <span className="social-icon">f</span>
+                Continue with Facebook
+            </button>
+            </div>
+
+            <p className="login-link">
+            Already have an account? 
+            <span onClick={() => navigate('/login')}> Log in</span>
+            </p>
+        </div>
         </div>
     );
 };

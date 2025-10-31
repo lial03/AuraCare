@@ -1,64 +1,93 @@
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
-const Dashboard=() =>{
+const Dashboard = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="dashboard-container">
-            
-            <div className="dashboard-header">
-                <h1 className="welcome-title">Hello Lina! 👋</h1>
-                <div className="user-avatar">
-                    <div className="avatar-circle">L</div>
-                </div>
+        {/* Header */}
+        <div className="dashboard-header">
+            <div className="welcome-section">
+            <h1 className="welcome-title">Hello, Lina! 👋</h1>
+            <p className="welcome-subtitle">How are you feeling today?</p>
             </div>
-
-            <div className="mood-section">
-                <div className="mood-chart-placeholder">
-                    No data logged
-                </div>
+            <div className="user-avatar">
+            <div className="avatar-circle">L</div>
             </div>
+        </div>
 
-            <div className="insights-card insights-card-1">
-                <p className="insights-content">
-                    <span className="insights-icon">📈</span> This Week's Insight<br/>
-                    You feel 40% better on days with morning walks
-                    <span className="insights-emoji"> 🚶</span>
-                </p>
+        {/* Mood Chart Section */}
+        <div className="mood-section">
+            <h2 className="section-title">Your Mood This Week</h2>
+            <div className="mood-chart">
+            <div className="chart-placeholder">
+                📊 Mood Chart - Recharts will go here
             </div>
-
-            <div className="insights-card insights-card-2">
-                <p className="insights-content">
-                    <span className="insights-icon">🎯</span> Your Pattern: Mood dips around 3 PM. Try a 5-minute break!
-                </p>
             </div>
+        </div>
 
-            <div className="support-section">
-                <button className="support-button">
-                    I Need Support Now
-                </button>
+        {/* Insights Card */}
+        <div className="insights-card">
+            <div className="insights-header">
+            <span className="insights-icon">💡</span>
+            <h3>This Week's Insight</h3>
             </div>
+            <p className="insights-text">
+            You feel 40% better on days with morning walks. Try starting your day with a short walk! 🚶‍♀️
+            </p>
+        </div>
 
+        {/* Support Button */}
+        <div className="support-section">
+            <button className="support-button">
+            <span className="support-icon">🆘</span>
+            I Need Support Now
+            </button>
+            <div className="pulse-indicator">• • •</div>
+        </div>
+
+        {/* Quick Actions Grid */}
+        <div className="quick-actions">
             <h2 className="section-title">Quick Actions</h2>
-            
-            <div className="quick-actions">
-                <div className="actions-grid">
-                    <div className="action-card">
-                        <div className="action-icon">📝</div>
-                        <span className="action-text">Log My Mood</span>
-                    </div>
-                    <div className="action-card">
-                        <div className="action-icon">👥</div>
-                        <span className="action-text">My Support Circle</span>
-                    </div>
-                    <div className="action-card">
-                        <div className="action-icon">💡</div>
-                        <span className="action-text">Resources</span>
-                    </div>
-                    <div className="action-card">
-                        <div className="action-icon">⚙️</div>
-                        <span className="action-text">My Profile</span>
-                    </div>
-                </div>
+            <div className="actions-grid">
+            <div 
+                className="action-card"
+                onClick={() => navigate('/mood-log')}
+            >
+                <div className="action-icon">📝</div>
+                <span className="action-text">Log My Mood</span>
             </div>
+            <div className="action-card">
+                <div className="action-icon">👥</div>
+                <span className="action-text">My Support Circle</span>
+            </div>
+            <div className="action-card">
+                <div className="action-icon">💡</div>
+                <span className="action-text">Resources</span>
+            </div>
+            <div className="action-card">
+                <div className="action-icon">⚙️</div>
+                <span className="action-text">My Profile</span>
+            </div>
+            </div>
+        </div>
+
+        {/* Bottom Navigation */}
+        <div className="bottom-nav">
+            <div className="nav-item active">
+            <span className="nav-icon">🏠</span>
+            <span className="nav-text">Home</span>
+            </div>
+            <div className="nav-item">
+            <span className="nav-icon">💡</span>
+            <span className="nav-text">Resources</span>
+            </div>
+            <div className="nav-item">
+            <span className="nav-icon">👤</span>
+            <span className="nav-text">Profile</span>
+            </div>
+        </div>
         </div>
     );
 };

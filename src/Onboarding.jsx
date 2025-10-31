@@ -1,39 +1,40 @@
+import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 
 const Onboarding = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="onboarding-container">
-            <div className="logo-section">
-                <div className="logo-circle">
-                    <h1 className="logo-title">AuraCare</h1>
-                    <span className="heart-icon">🤍</span>
-                </div>
-                <p className="app-tagline">Your pocket of peace</p>
+        <div className="logo-section">
+            <div className="logo-circle">
+            <span className="hand-wave">👋</span>
+            </div>
+            <h1 className="app-title">AuraCare</h1>
+            <p className="app-tagline">Your pocket of peace</p>
+        </div>
+
+        <div className="content-section">
+            <div className="illustration">
+            <div className="aura-blob"></div>
             </div>
 
-            <div className="illustration-section">
-                <div className="icon-line">
-                    <span className="icon chart-icon">📈</span> 
-                    <div className="line"></div>
-                    <span className="icon handshake-icon">🤝</span>
-                    <div className="line"></div>
-                    <span className="icon sparkle-icon">✨</span>
-                </div>
-            </div>
+            <p className="onboarding-text">
+            Understand your moods, connect with your support circle instantly, and find calm.
+            </p>
 
-            <div className="content-section">
-                <p className="onboarding-text">
-                    Understand your moods, connect with your support circle instantly, and find calm.
-                </p>
+            <button 
+            className="cta-button"
+            onClick={() => navigate('/signup')}
+            >
+            Create Your Safe Space
+            </button>
 
-                <button className="cta-button">
-                    Create Your Safe Space
-                </button>
-
-                <p className="login-link">
-                    I already have an account
-                </p>
-            </div>
+            <p className="login-link">
+            Already have an account? 
+            <span onClick={() => navigate('/login')}> Log In</span>
+            </p>
+        </div>
         </div>
     );
 };
