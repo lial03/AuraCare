@@ -1,175 +1,185 @@
 .dashboard-container {
-    min-height: 100vh;
-    background: #F3EBFF; 
-    padding: 20px;
+  min-height: 100vh;
+  background-color: #F3EBFF; 
+  padding: 20px;
+  padding-bottom: 80px; 
+  font-family: 'Inter', sans-serif;
 }
 
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+/* --- Header --- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .welcome-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: #2D2D2D;
-    margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2D2D2D;
+  margin: 0;
 }
 
-.user-avatar {
-    display: flex;
-    align-items: center;
+.time-avatar {
+  width: 35px;
+  height: 35px;
+  background-color: #A9A9A9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
 }
 
-.avatar-circle {
-    width: 36px;
-    height: 36px;
-    background-color: #A06FC7;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-}
-
-.section-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 20px;
-    font-weight: 600;
-    color: #6B6B6B;
-    margin: 32px 0 16px 0;
-}
-
+/* --- Mood Chart/Data Placeholder Area --- */
 .mood-section {
     margin-bottom: 16px;
 }
 
-.mood-chart-placeholder {
-    background: #A06FC7;
-    border-radius: 20px;
-    padding: 40px 24px;
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    box-shadow: 0 8px 20px rgba(160, 111, 199, 0.4); 
+.chart-title-label {
+    /* Style the title inside the chart card if needed */
+    display: none; 
 }
 
-.insights-card {
+.data-logged-card {
+  height: 150px;
+  /* Matches the purple color in the design screenshot */
+  background-color: #8B5FBF; 
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.mood-chart {
     background: white;
     border-radius: 16px;
-    padding: 16px;
+    padding: 10px 0 0 0; /* Adjusted padding for chart */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: 250px;
     margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
-    text-align: center;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    color: #2D2D2D;
-    line-height: 1.4;
 }
 
-.insights-content {
-    margin: 0;
+
+/* --- Insight Cards (Containers that appear below chart area) --- */
+.insight-card-1, .insight-card-2 {
+  background: white;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.insights-card-1 {
-    border: 1px solid rgba(160, 111, 199, 0.1);
+.insight-card-1 {
+  border: 1px solid #E0E0E0; 
 }
 
-.insights-card-2 {
-    border: 1px solid rgba(255, 107, 139, 0.1);
+.insight-card-2 {
+  border: 1px solid #FFCAD4; 
 }
 
-.insights-icon {
-    font-size: 16px;
-    font-weight: 600;
-    margin-right: 4px;
-    line-height: 1;
+.insight-icon {
+  font-size: 20px;
 }
 
-.insights-card-1 .insights-icon {
-    color: #A06FC7;
+.insight-text {
+  font-size: 14px;
+  color: #2D2D2D;
+  line-height: 1.4;
+  margin: 0;
 }
 
-.insights-card-2 .insights-icon {
-    color: #FF6B8B;
+.bold-label {
+  font-weight: 600;
+  color: #555;
 }
 
-.insights-emoji {
-    font-size: 16px;
+.tiny-icon {
+  font-size: 10px;
+  position: relative;
+  top: -2px;
+  margin-left: 5px;
 }
 
-.support-section {
-    text-align: center;
-    margin-bottom: 32px;
+/* --- 4. Emergency Support Button --- */
+.support-button-link {
+    text-decoration: none;
+    width: 100%;
 }
 
 .support-button {
-    width: 100%;
-    height: 52px;
-    background: #FF6B8B;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(255, 107, 139, 0.5);
-    transition: transform 0.2s, box-shadow 0.2s;
+  width: 100%;
+  height: 55px;
+  background-color: #FF6B8B; 
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(255, 107, 139, 0.4);
 }
 
-.support-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(255, 107, 139, 0.6);
+/* --- 5. Quick Actions --- */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #A9A9A9; 
+  margin: 0 0 16px 0;
 }
 
 .actions-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.action-link {
+    text-decoration: none;
+    color: inherit;
 }
 
 .action-card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px 20px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    cursor: pointer;
-    transition: transform 0.2s;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 120px;
-}
-
-.action-card:hover {
-    transform: translateY(-4px);
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
 }
 
 .action-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
-    display: block;
-    opacity: 0.8;
+  font-size: 24px;
+  margin-bottom: 8px;
+  display: block;
+  color: #8B5FBF; 
 }
 
+.action-card:nth-child(3) .action-icon { color: #FFD700; }
+.action-card:nth-child(4) .action-icon { color: #6B6B6B; }
+
 .action-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    color: #2D2D2D;
-    line-height: 1.2;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2D2D2D;
+}
+
+.loading-card {
+    background-color: #F8F8F8 !important; 
+    color: #6B6B6B !important;
+    border: 1px solid #E0E0E0;
+    font-style: italic;
 }

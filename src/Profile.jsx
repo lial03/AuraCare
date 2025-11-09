@@ -1,0 +1,134 @@
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './Profile.css';
+
+const Profile = () => {
+    const navigate = useNavigate();
+    const [user, setUser] = useState({ 
+        fullName: 'Loading...', 
+        email: 'loading@example.com',
+        phoneNumber: ''
+    });
+    const [isEditing, setIsEditing] = useState(false); 
+    const [editFormData, setEditFormData] = useState({}); 
+    
+    const userId = localStorage.getItem('currentUserId'); 
+    const token = localStorage.getItem('authToken');
+
+    // --- Data Fetch (Fetch user details) ---
+    const fetchProfile = async () => {
+        if (!userId || !token) { return; }
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/profile/${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }); 
+            const data = await response.json();
+            
+            if (response.ok) {
+                const profileData = {
+                    fullName: data.fullName || 'User Name',
+                    email: data.email || 'user@example.com',
+                    phoneNumber: data.phoneNumber || ''
+                };
+                setUser(profileData);
+                setEditFormData(profileData); // Initialize form data
+            }
+        } catch (error) {
+            console.error('Network error fetching profile:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProfile();
+    }, [userId, token]);
+
+    // --- Profile Update Logic ---
+    const handleEditChange = (e) => {
+        setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+    };
+
+    const handleUpdateSubmit = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const response = await fetch('http://localhost:5000/api/profile', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    fullName: editFormData.fullName,
+                    phoneNumber: editFormData.phoneNumber
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Profile updated successfully!');
+                setUser(data.user); // Update view state with fresh data
+                setIsEditing(false);
+            } else {
+                alert(`Update failed: ${data.message || 'Server error'}`);
+            }
+        } catch (error) {
+            alert('Could not connect to the server.');
+        }
+    };
+
+    // --- Secure Logout ---
+    const handleLogout = () => {
+        localStorage.removeItem('authToken'); 
+        localStorage.removeItem('currentUserId'); 
+        alert('You have been securely logged out.');
+        navigate('/'); 
+    };
+
+    // --- Render Logic ---
+    return (
+        <div className="profile-container">
+            <h1 className="screen-title">My Profile</h1>
+
+            {/* 1. User Information Card - Switches between View and Edit modes */}
+            {isEditing ? (
+                <form className="user-info-card edit-mode" onSubmit={handleUpdateSubmit}>
+                    <input type="text" name="fullName" value={editFormData.fullName} onChange={handleEditChange} required/>
+                    <input type="tel" name="phoneNumber" placeholder="Phone Number" value={editFormData.phoneNumber} onChange={handleEditChange}/>
+                    <div className="edit-buttons">
+                        <button type="button" className="cancel-button" onClick={() => setIsEditing(false)}>Cancel</button>
+                        <button type="submit" className="save-button">Save Changes</button>
+                    </div>
+                </form>
+            ) : (
+                <div className="user-info-card view-mode">
+                    <div className="user-avatar-large">{user.fullName[0] || 'L'}</div>
+                    <div className="user-details">
+                        <p className="user-name">{user.fullName}</p>
+                        <p className="user-email">{user.email}</p>
+                    </div>
+                    <button className="edit-profile-button" onClick={() => setIsEditing(true)}>
+                        Edit Profile
+                    </button>
+                </div>
+            )}
+
+            {/* 2. Settings List (Only visible in View mode) */}
+            {!isEditing && (
+                <div className="settings-list">
+                    <Link to="/notifications" className="settings-link"><div className="settings-item"><span className="item-icon">🔔</span><span className="item-text">Notifications</span><span className="arrow-icon">›</span></div></Link>
+                    <Link to="/support-circle" className="settings-link"><div className="settings-item"><span className="item-icon">👥</span><span className="item-text">My Support Circle</span><span className="arrow-icon">›</span></div></Link>
+                    <Link to="/privacy" className="settings-link"><div className="settings-item"><span className="item-icon">🔒</span><span className="item-text">Privacy & Security</span><span className="arrow-icon">›</span></div></Link>
+                    <Link to="/support-circle" className="settings-link"><div className="settings-item"><span className="item-icon">🆘</span><span className="item-text">Emergency Contacts</span><span className="arrow-icon">›</span></div></Link>
+                </div>
+            )}
+            
+            <button className="logout-button" onClick={handleLogout}>
+                Log Out
+            </button>
+        </div>
+    );
+};
+
+export default Profile;

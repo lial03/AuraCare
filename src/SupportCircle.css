@@ -1,0 +1,107 @@
+.support-circle-container {
+  min-height: 100vh;
+  background-color: #F3EBFF; 
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- Header (Shared Style) --- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.screen-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2D2D2D;
+  margin: 0;
+}
+
+.time-avatar {
+  width: 35px;
+  height: 35px;
+  background-color: #A9A9A9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* --- Description --- */
+.screen-description {
+    font-size: 16px;
+    color: #6B6B6B;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+/* --- Contacts List Placeholder --- */
+.contacts-list-placeholder {
+    height: 200px;
+    background-color: #F8F8F8;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #A9A9A9;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 30px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Contact Input Form --- */
+.contact-input-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.form-input-name,
+.form-input-phone {
+    width: 100%;
+    height: 55px;
+    background-color: rgba(139, 95, 191, 0.1); 
+    border: none;
+    border-radius: 12px;
+    padding: 0 18px;
+    font-size: 16px;
+    box-sizing: border-box;
+    color: #2D2D2D;
+    opacity: 0.9;
+}
+
+/* --- Add Button --- */
+.add-to-circle-link {
+    text-decoration: none;
+    display: block;
+    margin-top: 10px; 
+}
+
+.add-to-circle-button {
+    width: 100%;
+    height: 55px;
+    background-color: #8B5FBF; 
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(139, 95, 191, 0.4);
+}
+
+/* --- Notification Note --- */
+.notification-note {
+    text-align: center;
+    font-size: 14px;
+    color: #6B6B6B;
+    margin-top: 20px;
+}

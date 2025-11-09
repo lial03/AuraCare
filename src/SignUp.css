@@ -1,160 +1,192 @@
-.signup-container{
-    min-height: 100vh;
-    background: linear-gradient(180deg, #F3EBFF 0%, #FFFFFF 100%); 
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.auth-container {
+  background-color: #F3EBFF;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
 }
 
-.signup-card{
-    background: #FFFFFF; 
-    border-radius: 20px;
-    padding: 40px 32px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 10px 40px rgba(255, 127, 80, 0.2), 0 10px 40px rgba(180, 150, 200, 0.5);
-    border: 1px solid rgba(255, 127, 80, 0.1); 
-}
-
-.logo-section {
-    margin-bottom: 30px; 
+/* --- 1. Outside Logo (Shared) --- */
+.app-logo {
     text-align: center;
-}
-
-.logo-circle{
-    width: 100px; 
-    height: 100px;
-    background-color: #A06FC7;
-    border-radius: 50%;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    box-shadow: 0 5px 15px rgba(160, 111, 199, 0.3);
 }
 
-.logo-title {
+.logo-circle {
+  width: 90px;
+  height: 90px;
+  background-color: #8B5FBF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+  color: white; 
+  font-size: 32px;
+  position: relative;
+}
+
+.logo-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    font-weight: 600; 
-    color: #FFFFFF;
-    margin: 0;
+    font-weight: 600;
+    color: white;
 }
 
-.heart-icon{
-    font-size: 35px;
-    color: #FFFFFF;
-    line-height: 1;
-    margin-top: 3px;
-    transform: scaleX(1.1);
+/* --- 2. Main Authentication Card (Shared) --- */
+.auth-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px 30px;
+  box-shadow: 0 0 0 1px #F3EBFF, 0 8px 30px rgba(0, 0, 0, 0.05); 
+  width: 100%;
+  max-width: 350px;
 }
 
+/* --- Tab Navigation (Shared) --- */
 .tab-navigation {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 40px;
-    border-bottom: 1px solid #E0E0E0; 
-    padding: 0 20px;
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
 }
 
-.tab {
+.tab-navigation::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #E8E8E8;
+}
+
+.tab-button {
+    background: none;
+    border: none;
     font-family: 'Inter', sans-serif;
     font-size: 18px;
-    font-weight: 500;
-    padding: 0 0 12px 0; 
+    padding: 0;
     cursor: pointer;
-    flex-grow: 1; 
-    text-align: center;
-    color: #A06FC7;
+    font-weight: 500;
+    color: #6B6B6B;
+    transition: color 0.2s;
+    text-decoration: none; /* Crucial for Link component */
 }
 
-.tab.active {
-    color: #A06FC7;
+.active-tab {
+    color: #8B5FBF;
     font-weight: 600;
-    border-bottom: 3px solid #A06FC7; 
-    margin-bottom: -1px;
 }
 
-.signup-form{
-    margin-bottom: 24px;
+.tab-navigation .log-in {
+    margin-right: auto;
 }
 
-.input-group{
-    margin-bottom: 24px; 
-    position: relative; 
+.tab-navigation .sign-up {
+    margin-left: auto;
 }
 
-.form-input{
-    width: 100%;
-    height: 52px;
-    padding: 0 16px;
-    border: 1.5px solid #F3EBFF; 
-    border-radius: 12px;
-    font-size: 16px;
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box;
-    box-shadow: inset 0 2px 5px rgba(160, 111, 199, 0.1); 
-    transition: all 0.2s;
-    color: #2D2D2D; 
+.sign-up-underline {
+    position: absolute;
+    bottom: 0;
+    right: 30px;
+    width: 60px; 
+    height: 2px;
+    background-color: #8B5FBF;
 }
 
-.form-input::placeholder {
-    color: #A9A9A9; 
+/* --- Form Inputs (Shared) --- */
+.input-group {
+  margin-bottom: 16px;
 }
 
-.form-input:focus{
-    outline:none;
-    border-color:#A06FC7; 
+.form-input {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #E8E8E8;
+  background-color: #F8F8F8;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  box-sizing: border-box;
 }
 
-.input-group.input-with-icon .form-input {
-    padding-right: 45px; 
+.password-group {
+    position: relative;
 }
 
-.input-icon {
+.password-toggle {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #A9A9A9; 
-    cursor: pointer;
     font-size: 18px;
+    color: #A9A9A9;
+    cursor: pointer;
 }
 
-.signup-button{
+/* --- Sign Up Button --- */
+.signup-button-link {
+    text-decoration: none;
     width: 100%;
-    height: 52px;
-    background-color: #A06FC7; 
-    color: white;
-    font-size: 16px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    box-shadow: 0 8px 20px rgba(160, 111, 199, 0.5); 
-    margin-top: 24px; 
-    margin-bottom: 24px;
+    display: block;
 }
 
-.signup-button:hover{
-    background-color: #8B5FBF;
+.signup-button {
+  width: 100%;
+  height: 52px;
+  background-color: #8B5FBF; 
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px; 
 }
 
-.login-link{
-    font-family: 'Inter',sans-serif;
-    font-size: 14px;
-    color:#6B6B6B;
-    text-align: center;
-    margin: 0;
+/* --- 3. Bottom Log In Link --- */
+.login-link-outside {
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #6B6B6B;
+  margin-top: 20px;
 }
 
-.log-in-link-text{
-    color:#8B5FBF;
-    font-weight: 600;
-    cursor: pointer;
+.login-link-anchor {
+  color: #8B5FBF;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Password input specific styling */
+.password-group {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #A9A9A9;
+    cursor: pointer; 
+    user-select: none; 
 }

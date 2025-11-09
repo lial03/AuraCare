@@ -1,137 +1,125 @@
 .onboarding-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(180deg, #F3EBFF 0%, #FFFFFF 100%);
-    padding: 40px 20px;
-    justify-content: flex-start;
+  background-color: #F3EBFF; 
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  padding: 40px 20px;
+  text-align: center;
 }
 
-.logo-section{
-    text-align: center;
-    margin-top: 60px;
-    margin-bottom: 50px;
+/* --- 1. Logo Section --- */
+.logo-section {
+  margin-bottom: 50px; 
 }
 
-.logo-circle{
-    width: 120px;
-    height: 120px;
-    background-color: #A06FC7;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    box-shadow: 0 5px 20px rgba(160, 111, 199, 0.3);
+.logo-circle {
+  width: 120px;
+  height: 120px;
+  background-color: #8B5FBF; 
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
 }
 
-.logo-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 600; 
-    color: #FFFFFF;
-    margin: 0;
+.app-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: white;
+  margin-top: -10px; 
+  font-weight: 500;
 }
 
-.heart-icon{
-    font-size: 40px;
-    color: #FFFFFF;
-    line-height: 1;
-    margin-top: 5px;
+.heart-logo {
+  font-size: 48px;
+  color: white;
+  line-height: 1;
 }
 
-.app-tagline{
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
+.app-tagline {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: #6B6B6B;
+  margin: 0;
+}
+
+/* --- 2. Illustration Line --- */
+.illustration-line {
+  width: 70%; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin-bottom: 50px;
+}
+
+.illustration-line::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-bottom: 1px dashed #C4B0E8; 
+  z-index: 1;
+}
+
+.icon {
+  font-size: 24px; 
+  z-index: 2; 
+  padding: 5px;
+  background-color: #F3EBFF;
+  color: #8B5FBF; 
+}
+
+/* --- 3. Main Text and CTA --- */
+.content-section {
+  max-width: 300px;
+}
+
+.main-description {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400; 
+  color: #2D2D2D;
+  line-height: 1.5;
+  margin-bottom: 40px;
+}
+
+.cta-button-link {
+    text-decoration: none;
+    width: 100%;
+}
+
+.cta-button {
+  width: 100%;
+  max-width: 280px;
+  height: 55px;
+  background-color: #8B5FBF; 
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.login-link-anchor {
+    text-decoration: none;
     color: #6B6B6B;
-    margin: 0;
 }
 
-.illustration-section{
-    width: 100%;
-    max-width: 320px;
-    margin-bottom: 80px;
-}
-
-.icon-line{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    position: relative;
-}
-
-.line{
-    flex-grow: 1;
-    height: 2px;
-    background: #A06FC7;
-    margin: 0 -10px;
-}
-
-.icon{
-    font-size: 32px;
-    padding: 0 10px;
-    z-index: 10;
-}
-
-.chart-icon {
-    color: #A06FC7;
-    transform: rotate(270deg) scaleX(-1);
-}
-
-.handshake-icon {
-    font-size: 40px;
-    color: #2D2D2D;
-}
-
-.sparkle-icon {
-    color: #FFD700;
-    font-size: 28px;
-}
-
-.content-section{
-    text-align: center;
-    max-width: 350px;
-    width: 100%;
-}
-
-.onboarding-text{
-    font-family: 'Inter', sans-serif;
-    font-size: 18px;
-    font-weight: 500;
-    color: #2D2D2D;
-    margin-bottom: 40px;
-    line-height: 1.4; 
-    padding: 0 20px;
-}
-
-.cta-button{
-    background-color: #A06FC7; 
-    color: #FFFFFF;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    width: 100%;
-    max-width: 300px;
-    height: 52px;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 20px rgba(160, 111, 199, 0.5); 
-}
-
-.cta-button:hover{
-    background-color: #8B5FBF;
-}
-
-.login-link{
-    font-family: 'Inter',sans-serif;
-    font-size: 14px;
-    color:#6B6B6B;
-    margin:0;
-    cursor: pointer;
-    text-decoration: underline;
+.login-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #6B6B6B;
+  margin: 0;
+  text-decoration: underline; 
+  cursor: pointer;
 }

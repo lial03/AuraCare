@@ -1,0 +1,183 @@
+.profile-container {
+  min-height: 100vh;
+  /* Light purple background from the design */
+  background-color: #F3EBFF; 
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.screen-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2D2D2D;
+  margin: 0 0 30px 0;
+}
+
+/* --- 1. User Information Card --- */
+.user-info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.user-avatar-large {
+    width: 50px;
+    height: 50px;
+    background-color: #8B5FBF; /* Primary purple color */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.user-details {
+    flex-grow: 1;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2D2D2D;
+    margin: 0 0 2px 0;
+}
+
+.user-email {
+    font-size: 14px;
+    color: #6B6B6B;
+    margin: 0;
+}
+
+.edit-profile-button {
+    /* Positioned inside the card, next to the details */
+    height: 30px;
+    padding: 0 15px;
+    background-color: #A06FC7;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    position: absolute; /* Allows precise positioning */
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* --- 2. Settings List --- */
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.settings-item {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.item-icon {
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.item-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2D2D2D;
+    flex-grow: 1;
+}
+
+.arrow-icon {
+    font-size: 20px;
+    color: #A9A9A9;
+    font-weight: 700;
+}
+
+/* --- 3. Log Out Button --- */
+.logout-button {
+    width: 100%;
+    height: 55px;
+    background-color: rgba(255, 107, 139, 0.1); /* Very light pink/red background */
+    color: #FF6B8B; /* Bright pink/red text */
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.user-info-card.edit-mode {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.user-info-card.edit-mode input[type="text"],
+.user-info-card.edit-mode input[type="tel"] {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.user-info-card.edit-mode .edit-buttons {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.save-button, .cancel-button {
+    height: 35px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.save-button {
+    background-color: #8B5FBF;
+    color: white;
+}
+
+.cancel-button {
+    background-color: #E0E0E0;
+    color: #333;
+}
+
+/* Ensure settings list moves down when in edit mode */
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Only apply margin if the settings list is visible */
+    margin-bottom: 40px; 
+}
+
+.user-info-card.view-mode {
+    /* Maintain original flex layout */
+    display: flex;
+    align-items: center;
+}

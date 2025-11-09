@@ -1,42 +1,46 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Onboarding.css';
 
 const Onboarding = () => {
-    const navigate = useNavigate();
-
-    return (
-        <div className="onboarding-container">
-        <div className="logo-section">
-            <div className="logo-circle">
-            <span className="hand-wave">👋</span>
-            </div>
-            <h1 className="app-title">AuraCare</h1>
-            <p className="app-tagline">Your pocket of peace</p>
+  // Placeholder mood icons used for the illustration line
+  return (
+    <div className="onboarding-container">
+      {/* 1. Logo Section (AuraCare Heart & Tagline) */}
+      <div className="logo-section">
+        <div className="logo-circle">
+          <div className="heart-logo">🤍</div> 
+          <span className="app-name">AuraCare</span>
         </div>
+        <p className="app-tagline">Your pocket of peace</p>
+      </div>
 
-        <div className="content-section">
-            <div className="illustration">
-            <div className="aura-blob"></div>
-            </div>
+      {/* 2. Illustration Section (Mood, Support, Calm) */}
+      <div className="illustration-line">
+        <div className="icon mood-graph">📈</div>
+        <div className="icon handshake">🤝</div>
+        <div className="icon sparkle">✨</div>
+      </div>
 
-            <p className="onboarding-text">
-            Understand your moods, connect with your support circle instantly, and find calm.
-            </p>
-
-            <button 
-            className="cta-button"
-            onClick={() => navigate('/signup')}
-            >
+      {/* 3. Main Text Content */}
+      <div className="content-section">
+        <p className="main-description">
+          Understand your moods, connect with your support circle instantly, and find calm.
+        </p>
+        
+        {/* Call to Action Button -> Links to Sign Up */}
+        <Link to="/signup" className="cta-button-link">
+          <button className="cta-button">
             Create Your Safe Space
-            </button>
+          </button>
+        </Link>
 
-            <p className="login-link">
-            Already have an account? 
-            <span onClick={() => navigate('/login')}> Log In</span>
-            </p>
-        </div>
-        </div>
-    );
+        {/* Login Link -> Links to Log In */}
+        <p className="login-link">
+          <Link to="/login" className="login-link-anchor">I already have an account</Link>
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default Onboarding;

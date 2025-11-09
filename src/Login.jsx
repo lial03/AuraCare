@@ -1,72 +1,84 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 
 const Login = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    identifier: '',
+    password: ''
+  });
 
-    return (
-        <div className="login-container">
-        <div className="login-card">
-            <div className="login-header">
-            <h1 className="login-title">Log In</h1>
-            <p className="login-subtitle">Welcome back to your safe space</p>
-            </div>
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-            <div className="login-form">
-            <div className="input-group">
-                <input 
-                type="email" 
-                placeholder="Email or phone number"
-                className="form-input"
-                />
-            </div>
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-            <div className="input-group">
-                <input 
-                type="password" 
-                placeholder="Password"
-                className="form-input"
-                />
-            </div>
+  const handleLogin = async () => {
+    // Check if fields are empty before proceeding (basic client-side validation)
+    if (!formData.identifier || !formData.password) {
+        alert('Please enter both email/phone and password.');
+        return;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-            <p className="forgot-password">Forgot Password?</p>
+      const data = await response.json();
 
-            <button 
-                className="login-button"
-                onClick={() => navigate('/dashboard')}
-            >
-                Log In
-            </button>
-            </div>
+      if (response.ok) {
+        localStorage.setItem('authToken', data.token); 
+        localStorage.setItem('currentUserId', data.userId); 
+        
+        navigate('/dashboard'); 
+      } else {
+        alert(`Login failed: ${data.message || 'Invalid credentials'}`);
+      }
+    } catch (error) {
+      console.error("Network or Fetch Error:", error);
+      alert('Could not connect to the server.');
+    }
+  };
 
-            <div className="divider">
-            <span>or</span>
-            </div>
-
-            <div className="social-login">
-            <button className="social-button google">
-                <span className="social-icon">G</span>
-                Continue with Google
-            </button>
-            
-            <button className="social-button apple">
-                <span className="social-icon">A</span>
-                Continue with Apple
-            </button>
-            
-            <button className="social-button facebook">
-                <span className="social-icon">f</span>
-                Continue with Facebook
-            </button>
-            </div>
-
-            <p className="signup-link">
-            Don't have an account? 
-            <span onClick={() => navigate('/signup')}> Sign up</span>
-            </p>
+  return (
+    <div className="auth-container">
+      {/* ... (JSX for Logo and Tabs) ... */}
+      <div className="auth-card">
+        
+        <div className="tab-navigation">
+          <Link to="/login" className="tab-button log-in active-tab">Log In</Link>
+          <Link to="/signup" className="tab-button sign-up">Sign Up</Link>
+          <div className="tab-underline log-in-underline"></div>
         </div>
+        
+        {/* Removed <form> tag */}
+        <div className="login-form-content">
+          
+          <div className="input-group">
+            <input type="text" name="identifier" placeholder="Email or Phone" className="form-input" value={formData.identifier} onChange={handleChange} required/>
+          </div>
+
+          <div className="input-group password-group">
+            <input type={showPassword ? "text" : "password"} name="password" placeholder="Password" className="form-input" value={formData.password} onChange={handleChange} required/>
+            <span className="password-toggle" onClick={togglePasswordVisibility}>
+              {showPassword ? "🙈" : "👁️"}
+            </span> 
+          </div>
+
+          {/* CRITICAL: Logic attached directly to onClick */}
+          <button type="button" className="login-button" onClick={handleLogin}>
+            Log In
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Login;
