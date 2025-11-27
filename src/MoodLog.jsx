@@ -16,6 +16,18 @@ const MoodLog = () => {
         { emoji: '☯️', label: 'Mixed' },
     ];
     
+    // --- New Functionality: Handle Mood Selection with Guided Prompt ---
+    const handleSelectMood = (label) => {
+        setSelectedMood(label);
+        
+        if (label === 'Mixed') {
+            setNotes("I feel mixed because:\n\nGood thing 1: \nBad thing 1: \n\nI need to focus on:");
+        } else if (selectedMood === 'Mixed') {
+            // Clear prompt if switching away from Mixed
+            setNotes('');
+        }
+    };
+    
     const handleSave = async () => {
         if (!selectedMood) {
             alert('Please select your current mood.');
@@ -28,6 +40,9 @@ const MoodLog = () => {
             navigate('/login');
             return;
         }
+        
+        // Determine if it should be saved as a Journal Entry
+        const moodToSave = selectedMood === 'Mixed' ? 'Journal Entry' : selectedMood;
 
         try {
             const response = await fetch('http://localhost:5000/api/moodlog', {
@@ -36,12 +51,18 @@ const MoodLog = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ mood: selectedMood, notes }),
+                body: JSON.stringify({ mood: moodToSave, notes }),
             });
 
             if (response.ok) {
                 alert('Mood logged successfully!');
-                navigate('/dashboard'); 
+                
+                // If it was a Mixed entry, guide them toward reflection
+                if (selectedMood === 'Mixed') {
+                    navigate('/resources/journaling');
+                } else {
+                    navigate('/dashboard'); 
+                }
             } else {
                 alert('Failed to save mood. Check server logs.');
             }
@@ -67,7 +88,7 @@ const MoodLog = () => {
                         <div 
                             key={mood.label} 
                             className={`mood-option ${selectedMood === mood.label ? 'selected' : ''}`}
-                            onClick={() => setSelectedMood(mood.label)}
+                            onClick={() => handleSelectMood(mood.label)} // Use new handler
                         >
                             <span className="mood-icon">{mood.emoji}</span>
                             <span className="mood-label">{mood.label}</span>
@@ -79,7 +100,7 @@ const MoodLog = () => {
             <div className="notes-section">
                 <textarea
                     className="mood-notes-textarea"
-                    placeholder="Any notes? (Optional)" 
+                    placeholder={selectedMood === 'Mixed' ? "Use the prompt above to guide your thoughts." : "Any notes? (Optional)"} 
                     rows="4"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
@@ -88,7 +109,7 @@ const MoodLog = () => {
             
             <div className="action-button-group">
                 <button className="log-mood-button" onClick={handleSave}>
-                    Save How I Feel
+                    {selectedMood === 'Mixed' ? "Save Reflection" : "Save How I Feel"}
                 </button>
             </div>
         </div>

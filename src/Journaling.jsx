@@ -33,8 +33,8 @@ const Journaling = () => {
             });
 
             if (response.ok) {
-                alert('Journal entry saved successfully!');
-                navigate('/dashboard'); 
+                alert('Journal entry saved successfully! View it in Past Entries.');
+                navigate('/journal-history'); // Direct to history view after saving new entry
             } else {
                 alert('Failed to save journal entry. Check server logs.');
             }
@@ -52,7 +52,7 @@ const Journaling = () => {
             <p>This section is where you can write about things you are grateful for today. Focus on the positive!</p>
             
             <textarea 
-                placeholder="Start writing here..." 
+                placeholder={"Start writing here..."} 
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 style={{ 
