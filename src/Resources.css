@@ -3,34 +3,50 @@
   background-color: #F3EBFF; 
   padding: 20px;
   font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
 
-/* --- Header (Shared Style) --- */
+/* --- Header --- */
 .app-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: 30px;
+  position: relative; 
+  padding: 0;
+  height: 40px; 
 }
 
+
+/* Title*/
 .screen-title {
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 700;
   color: #2D2D2D;
   margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  text-align: center;
+  line-height: 1.2;
 }
 
+/* Avatar*/
 .time-avatar {
-  width: 35px;
-  height: 35px;
-  background-color: #A9A9A9;
+  width: 40px;
+  height: 40px;
+  background-color: #8B5FBF;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(139, 95, 191, 0.3);
+  position: absolute;
+  right: 20px;
 }
 
 .section-group {
@@ -39,7 +55,7 @@
 
 .section-title {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 700;
     color: #2D2D2D;
     margin: 0 0 15px 0;
 }
@@ -47,22 +63,27 @@
 /* --- Immediate Help Section --- */
 .immediate-help-card {
     background-color: #A34747;
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 16px;
+    padding: 25px; 
     color: white;
-    box-shadow: 0 4px 15px rgba(163, 71, 71, 0.4);
+    box-shadow: 0 6px 18px rgba(163, 71, 71, 0.4);
+    transition: transform 0.1s;
+}
+.immediate-help-card:active {
+    transform: scale(0.99);
 }
 
 .helpline-number {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
     margin: 0 0 5px 0;
 }
 
 .helpline-note {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     margin: 0;
+    opacity: 0.9;
 }
 
 /* --- Quick Mood Boosters & Educational Resources --- */
@@ -70,7 +91,7 @@
 .educational-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .booster-link {
@@ -81,34 +102,45 @@
 .booster-button,
 .edu-button {
     width: 100%;
-    height: 60px;
+    height: 65px;
     background-color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 16px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     color: #2D2D2D;
     text-align: left;
-    padding: 0 20px;
+    padding: 0 25px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.1s;
+}
+
+.booster-button:hover,
+.edu-button:hover {
+    background-color: #F8F8F8;
+}
+
+.booster-button:active,
+.edu-button:active {
+    transform: scale(0.98);
 }
 
 .booster-icon,
 .edu-icon {
-    font-size: 20px;
-    margin-right: 12px;
+    font-size: 22px;
+    margin-right: 15px;
 }
 
 .edu-button {
     background-color: rgba(139, 95, 191, 0.1);
-    box-shadow: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .learn-more {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     color: #6B6B6B;
     margin: -10px 0 15px 0;

@@ -57,7 +57,6 @@ const Login = () => {
           <div className="tab-underline log-in-underline"></div>
         </div>
         
-        {/* Removed <form> tag */}
         <div className="login-form-content">
           
           <div className="input-group">

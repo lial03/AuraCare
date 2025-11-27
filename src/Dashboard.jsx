@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   CartesianGrid,
   Line,
@@ -18,20 +18,22 @@ const moodToValue = (mood) => {
         case 'Okay': return 3;
         case 'Good': return 4;
         case 'Amazing': return 5;
+        case 'Mixed': return 3;
         default: return 3;
     }
 };
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [moodHistory, setMoodHistory] = useState([]);
   const [insights, setInsights] = useState(null); 
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('Lina');
 
   const MIN_DATA_POINTS_FOR_INSIGHTS = 3; 
   const hasEnoughData = moodHistory.length >= MIN_DATA_POINTS_FOR_INSIGHTS && insights && insights.hasData;
   const token = localStorage.getItem('authToken');
 
-  // --- Data Fetching Effect ---
   useEffect(() => {
     const fetchAllData = async () => {
       if (!token) {
@@ -39,7 +41,28 @@ const Dashboard = () => {
           return;
       }
       
+      const userId = localStorage.getItem('currentUserId');
+
+      const fetchUserName = async (currentUserId) => {
+          try {
+              const profileResponse = await fetch(`http://localhost:5000/api/profile/${currentUserId}`, {
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+              const profileData = await profileResponse.json();
+              if (profileResponse.ok) {
+                  setUserName(profileData.fullName || 'User');
+              }
+          } catch (e) {
+              console.error("Failed to fetch user name:", e);
+          }
+      };
+
       setLoading(true);
+      
+      if (userId) {
+          fetchUserName(userId);
+      }
+
       try {
         const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -51,7 +74,6 @@ const Dashboard = () => {
         const moodData = await moodResponse.json();
         const insightData = await insightResponse.json();
         
-        // 1. Process Mood History (for Chart)
         if (moodResponse.ok && Array.isArray(moodData)) {
             const processedData = moodData.map(entry => ({
                 date: new Date(entry.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -63,7 +85,6 @@ const Dashboard = () => {
             setMoodHistory([]);
         }
 
-        // 2. Set Insights State (for Cards)
         if (insightResponse.ok) {
             setInsights(insightData);
         } else {
@@ -80,8 +101,36 @@ const Dashboard = () => {
     };
     fetchAllData();
   }, [token]);
+
+  const handleSupportSignal = async () => {
+      if (!token) {
+          alert('Session expired. Please log in.');
+          navigate('/login');
+          return;
+      }
+
+      try {
+          const response = await fetch('http://localhost:5000/api/need-support', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+          
+          const data = await response.json();
+
+          if (response.ok) {
+              navigate('/help-on-way', { state: { notifiedContacts: data.notifiedContacts } });
+          } else if (response.status === 400 && data.message.includes('No contacts')) {
+              alert('Please add contacts to your support circle before activating the signal.');
+              navigate('/support-circle');
+          } else {
+              alert(`Failed to activate support signal: ${data.message || 'Server Error'}`);
+          }
+      } catch (error) {
+          console.error('Network error activating support signal:', error);
+          alert('Could not connect to the server or unexpected error.');
+      }
+  };
     
-  // --- Chart/Placeholder Rendering Function ---
   const renderMoodChart = () => {
       if (loading) {
           return <div className="data-logged-card loading-card"><p>Loading mood data...</p></div>;
@@ -99,7 +148,7 @@ const Dashboard = () => {
         <div className="mood-chart">
             <h2 className="chart-title-label">Your Mood Trend</h2>
             <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={moodHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <LineChart data={moodHistory} margin={{ top: 10, right: 10, left: 20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
                     
                     <XAxis dataKey="date" interval={0} tickLine={false} style={{ fontSize: '10px' }} stroke="#6B6B6B" />
@@ -108,7 +157,8 @@ const Dashboard = () => {
                         domain={[1, 5]} 
                         ticks={[1, 2, 3, 4, 5]} 
                         tickFormatter={(value) => {
-                            const labels = ['Terrible', 'Down', 'Okay', 'Good', 'Amazing'];
+                            const labels = ['Terrible', 'Down', 'Okay/Mixed', 'Good', 'Amazing'];
+                            if (value < 1 || value > 5) return ''; 
                             return labels[value - 1];
                         }}
                         tickLine={false}
@@ -140,10 +190,16 @@ const Dashboard = () => {
     <div className="dashboard-container">
       
       <div className="app-header">
-        <h1 className="welcome-title">Hello Lina! 👋</h1>
-        <div className="time-avatar">L</div> 
+        <h1 className="welcome-title">Hello {userName}! 👋</h1>
+        <div className="time-avatar">{userName[0]}</div> 
       </div>
 
+      <div style={{ textAlign: 'right', marginBottom: '10px' }}>
+          <Link to="/mood-history" style={{ color: '#8B5FBF', fontWeight: '600', textDecoration: 'none', fontSize: '14px' }}>
+              View All Mood History »
+          </Link>
+      </div>
+      
       <div className="mood-section">
         {renderMoodChart()}
       </div>
@@ -168,11 +224,11 @@ const Dashboard = () => {
         </div>
       )}
       
-      <Link to="/help-on-way" className="support-button-link">
-        <button className="support-button">
+      <div className="support-button-link"> 
+        <button className="support-button" onClick={handleSupportSignal}>
           I Need Support Now
         </button>
-      </Link>
+      </div>
 
       <h2 className="section-title">Quick Actions</h2>
       <div className="actions-grid">

@@ -1,0 +1,132 @@
+.breathing-exercise-container {
+    min-height: 100vh;
+    background-color: #F3EBFF; 
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.back-link {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+.back-link a {
+    color: #8B5FBF;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: color 0.1s;
+}
+
+.exercise-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #2D2D2D;
+    margin-bottom: 15px;
+}
+
+.exercise-description {
+    font-size: 17px;
+    color: #6B6B6B;
+    max-width: 350px;
+    margin-bottom: 60px; 
+}
+
+/* --- Breathing Circle Styles --- */
+
+.breathing-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.breathing-circle {
+    width: 280px; 
+    height: 280px;
+    border-radius: 50%;
+    background-color: #8B5FBF;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 rgba(139, 95, 191, 0.5); 
+    transition: all 4s cubic-bezier(0.4, 0, 0.2, 1); 
+    font-weight: 700;
+}
+
+.phase-label {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.countdown {
+    font-size: 80px; 
+    font-weight: 900;
+    margin: 0;
+    line-height: 1;
+}
+
+/* Dynamic Animation Classes */
+
+.breathe-in {
+    transform: scale(1.15); 
+    background-color: #A06FC7;
+    box-shadow: 0 0 35px rgba(160, 111, 199, 0.9);
+    transition-duration: 4s;
+}
+
+.hold {
+    transform: scale(1.15);
+    background-color: #A06FC7;
+    box-shadow: 0 0 25px rgba(160, 111, 199, 0.7);
+    transition-duration: 4s;
+}
+
+.breathe-out {
+    transform: scale(0.85);
+    background-color: #8B5FBF;
+    box-shadow: 0 0 15px rgba(139, 95, 191, 0.5);
+    transition-duration: 4s;
+}
+
+.hold-out {
+    transform: scale(0.85);
+    background-color: #8B5FBF;
+    box-shadow: 0 0 10px rgba(139, 95, 191, 0.3);
+    transition-duration: 4s;
+}
+
+/* Done Button */
+.done-button-link {
+    width: 100%;
+    max-width: 380px;
+    margin-top: auto; 
+}
+
+.done-button {
+    width: 100%;
+    height: 55px;
+    background-color: #FF6B8B; 
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(255, 107, 139, 0.5);
+    transition: transform 0.1s;
+}
+.done-button:active {
+    transform: scale(0.98);
+}

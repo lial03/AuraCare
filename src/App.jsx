@@ -1,12 +1,19 @@
 import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import './App.css';
+import BreathingExercise from './BreathingExercise';
 import Dashboard from './Dashboard';
 import EmergencyNotification from './EmergencyNotification';
+import JournalHistory from './JournalHistory';
+import Journaling from './Journaling';
 import Login from './Login';
+import MentalHealth from './MentalHealth';
+import MoodHistoryPage from './MoodHistoryPage';
 import MoodLog from './MoodLog';
+import Music from './Music';
 import Onboarding from './Onboarding';
 import PrivateRoute from './PrivateRoute';
 import Profile from './Profile';
+import Resilience from './Resilience';
 import Resources from './Resources';
 import SignUp from './SignUp';
 import SupportCircle from './SupportCircle';
@@ -16,12 +23,10 @@ const AppRoutes = () => {
 
     return (
         <Routes>
-            {/* 1. Public Routes */}
             <Route path="/" element={<Onboarding />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
             
-            {/* 2. Private Routes (Protected by JWT) */}
             <Route element={<PrivateRoute />}>
                 <Route path="/dashboard" element={<Dashboard key={location.key} />} />
                 <Route path="/log-mood" element={<MoodLog />} />
@@ -29,6 +34,15 @@ const AppRoutes = () => {
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/help-on-way" element={<EmergencyNotification />} />
+                
+                <Route path="/breathing-exercise" element={<BreathingExercise />} />
+                <Route path="/resources/music" element={<Music />} />
+                <Route path="/resources/journaling" element={<Journaling />} />
+                <Route path="/resources/mental-health" element={<MentalHealth />} />
+                <Route path="/resources/resilience" element={<Resilience />} />
+                <Route path="/journal-history" element={<JournalHistory />} />
+                <Route path="/mood-history" element={<MoodHistoryPage />} />
+                
                 <Route path="/notifications" element={<h1>Notifications Setting</h1>} />
                 <Route path="/privacy" element={<h1>Privacy & Security Setting</h1>} />
             </Route>

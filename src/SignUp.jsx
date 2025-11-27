@@ -57,7 +57,6 @@ const SignUp = () => {
           <div className="tab-underline sign-up-underline"></div>
         </div>
         
-        {/* Removed <form> tag */}
         <div className="signup-form-content">
           
           <div className="input-group">

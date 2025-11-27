@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import './Onboarding.css';
 
 const Onboarding = () => {
-  // Placeholder mood icons used for the illustration line
   return (
     <div className="onboarding-container">
       {/* 1. Logo Section (AuraCare Heart & Tagline) */}

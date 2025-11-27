@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './MoodLog.css'; // <-- Corrected local import
+import { Link, useNavigate } from 'react-router-dom';
+import './MoodLog.css';
 
 const MoodLog = () => {
     const navigate = useNavigate();
@@ -8,12 +8,12 @@ const MoodLog = () => {
     const [notes, setNotes] = useState('');
 
     const moodOptions = [
-        // Ensure emojis match the screenshot for display consistency
-        { emoji: '😬', label: 'Terrible' }, // Updated to match image emoji
+        { emoji: '😬', label: 'Terrible' }, 
         { emoji: '😞', label: 'Down' },
         { emoji: '😐', label: 'Okay' },
         { emoji: '😊', label: 'Good' },
-        { emoji: '🤩', label: 'Amazing' }, // Updated to match image emoji
+        { emoji: '🤩', label: 'Amazing' }, 
+        { emoji: '☯️', label: 'Mixed' },
     ];
     
     const handleSave = async () => {
@@ -52,13 +52,14 @@ const MoodLog = () => {
 
     return (
         <div className="mood-log-container">
-            {/* 1. Header (Title and Avatar) */}
             <header className="log-header">
+                <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', lineHeight: '1', position: 'absolute', left: '20px' }}>
+                    « Back
+                </Link>
                 <h1 className="log-title">How are you feeling today?</h1>
                 <div className="time-avatar">L</div> 
             </header>
 
-            {/* 2. Mood Selection Section */}
             <div className="mood-selection-section">
                 <p className="section-prompt">Select your current mood:</p>
                 <div className="mood-grid">
@@ -75,7 +76,6 @@ const MoodLog = () => {
                 </div>
             </div>
 
-            {/* 3. Notes Section */}
             <div className="notes-section">
                 <textarea
                     className="mood-notes-textarea"
@@ -86,7 +86,6 @@ const MoodLog = () => {
                 ></textarea>
             </div>
             
-            {/* 4. Action Button */}
             <div className="action-button-group">
                 <button className="log-mood-button" onClick={handleSave}>
                     Save How I Feel

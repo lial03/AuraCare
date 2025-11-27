@@ -1,5 +1,3 @@
-// server/server.js
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -11,19 +9,13 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- Middleware ---
 app.use(helmet()); 
 app.use(cors());
-app.use(express.json()); // Parses incoming JSON requests
+app.use(express.json());
 
-
-// --- 1. MongoDB Connection ---
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB connected successfully!'))
     .catch(err => console.error('MongoDB connection error:', err));
-
-
-// --- 2. Schemas and Models ---
 
 const SupportContactSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -47,8 +39,6 @@ const MoodLogSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const MoodLog = mongoose.model('MoodLog', MoodLogSchema);
 
-
-// Helper functions
 const moodToValue = (mood) => {
     switch (mood) {
         case 'Terrible': return 1;
@@ -56,6 +46,8 @@ const moodToValue = (mood) => {
         case 'Okay': return 3;
         case 'Good': return 4;
         case 'Amazing': return 5;
+        case 'Mixed': return 3;
+        case 'Journal Entry': return 3;
         default: return 3;
     }
 };
@@ -104,8 +96,6 @@ const generateDynamicInsights = (moodHistory) => {
 };
 
 
-// --- 3. Authentication Middleware ---
-
 const authenticateUser = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
@@ -124,9 +114,8 @@ const authenticateUser = (req, res, next) => {
     }
 };
 
-// --- 4. API Routes ---
+// --- API Routes ---
 
-// POST /api/signup
 app.post('/api/signup', async (req, res) => {
     try {
         const { fullName, email, password, phoneNumber } = req.body;
@@ -143,7 +132,6 @@ app.post('/api/signup', async (req, res) => {
     }
 });
 
-// POST /api/login
 app.post('/api/login', async (req, res) => {
     const { identifier, password } = req.body; 
     try {
@@ -169,7 +157,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// POST /api/moodlog
 app.post('/api/moodlog', authenticateUser, async (req, res) => {
     try {
         const { mood, notes } = req.body;
@@ -181,23 +168,61 @@ app.post('/api/moodlog', authenticateUser, async (req, res) => {
     }
 });
 
-// GET /api/moodhistory
+app.delete('/api/moodlog/:logId', authenticateUser, async (req, res) => {
+    try {
+        const { logId } = req.params;
+        
+        const deletedLog = await MoodLog.findOneAndDelete({ 
+            _id: logId, 
+            userId: req.userId 
+        });
+
+        if (!deletedLog) {
+            return res.status(404).json({ message: 'Journal entry not found or unauthorized.' });
+        }
+
+        res.status(200).json({ message: 'Journal entry deleted successfully.' });
+
+    } catch (error) {
+        if (error.name === 'CastError') { return res.status(400).json({ message: 'Invalid log ID format.' }); }
+        res.status(500).json({ message: 'Failed to delete journal entry.', error: error.message });
+    }
+});
+
+
 app.get('/api/moodhistory', authenticateUser, async (req, res) => {
     try {
-        const history = await MoodLog.find({ userId: req.userId })
+        const history = await MoodLog.find({ 
+            userId: req.userId,
+            mood: { $ne: 'Journal Entry' }
+        })
             .sort({ createdAt: -1 })
             .limit(7)
-            .select('mood createdAt');
+            .select('mood notes createdAt');
         res.status(200).json(history);
     } catch (error) {
         res.status(500).json({ message: 'Failed to retrieve mood history', error: error.message });
     }
 });
 
-// GET /api/insights
+app.get('/api/journalhistory', authenticateUser, async (req, res) => {
+    try {
+        const history = await MoodLog.find({ userId: req.userId, mood: 'Journal Entry' })
+            .sort({ createdAt: -1 })
+            .select('notes createdAt _id');
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to retrieve journal history', error: error.message });
+    }
+});
+
 app.get('/api/insights', authenticateUser, async (req, res) => {
     try {
-        const moodHistory = await MoodLog.find({ userId: req.userId }).sort({ createdAt: -1 });
+        const moodHistory = await MoodLog.find({ 
+            userId: req.userId,
+            mood: { $ne: 'Journal Entry' }
+        }).sort({ createdAt: -1 });
+        
         const insights = generateDynamicInsights(moodHistory);
 
         if (!insights) { return res.status(200).json({ hasData: false }); }
@@ -208,7 +233,6 @@ app.get('/api/insights', authenticateUser, async (req, res) => {
     }
 });
 
-// GET /api/profile/:userId (Used by frontend to fetch profile details after login)
 app.get('/api/profile/:userId', async (req, res) => {
     try {
         const user = await User.findById(req.params.userId).select('-password');
@@ -220,7 +244,6 @@ app.get('/api/profile/:userId', async (req, res) => {
     }
 }); 
 
-// PUT /api/profile (Protected Route for editing profile)
 app.put('/api/profile', authenticateUser, async (req, res) => {
     try {
         const { fullName, phoneNumber } = req.body;
@@ -245,7 +268,6 @@ app.put('/api/profile', authenticateUser, async (req, res) => {
     }
 });
 
-// POST /api/support-circle
 app.post('/api/support-circle', authenticateUser, async (req, res) => {
     try {
         const { name, phone } = req.body;
@@ -264,8 +286,57 @@ app.post('/api/support-circle', authenticateUser, async (req, res) => {
     }
 });
 
+app.delete('/api/support-circle/:contactId', authenticateUser, async (req, res) => {
+    try {
+        const { contactId } = req.params;
 
-// Start Server
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            { $pull: { supportCircle: { _id: contactId } } },
+            { new: true, runValidators: true }
+        ).select('supportCircle');
+
+        if (!updatedUser) { return res.status(404).json({ message: 'User not found.' }); }
+        
+        res.status(200).json({ 
+            message: 'Contact deleted successfully', 
+            supportCircle: updatedUser.supportCircle 
+        });
+    } catch (error) {
+        if (error.name === 'CastError') { return res.status(400).json({ message: 'Invalid contact ID format.' }); }
+        res.status(500).json({ message: 'Failed to delete contact: Internal server error', error: error.message });
+    }
+});
+
+
+app.post('/api/need-support', authenticateUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('fullName supportCircle');
+        if (!user) { return res.status(404).json({ message: 'User not found.' }); }
+
+        if (user.supportCircle.length === 0) {
+            return res.status(400).json({ message: 'No contacts in support circle to notify.' });
+        }
+        
+        let sentCount = 0;
+        
+        for (const contact of user.supportCircle) {
+            console.log(`[MOCK SMS] Sending to ${contact.name} (${contact.phone}): ${user.fullName} needs support now. Please reach out.`);
+            sentCount++;
+        }
+        
+        res.status(200).json({ 
+            message: `Emergency signal sent. ${sentCount} contact(s) notified.`,
+            notifiedContacts: user.supportCircle.map(c => ({ name: c.name, phone: c.phone, _id: c._id }))
+        });
+
+    } catch (error) {
+        console.error('Error sending support notification:', error);
+        res.status(500).json({ message: 'Failed to send support signal: Internal server error' });
+    }
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './SupportCircle.css'; // Correct local import
+import { Link, useNavigate } from 'react-router-dom';
+import './SupportCircle.css';
 
 const SupportCircle = () => {
   const navigate = useNavigate();
@@ -12,7 +12,6 @@ const SupportCircle = () => {
   const userId = localStorage.getItem('currentUserId'); 
   const token = localStorage.getItem('authToken');
 
-  // --- 1. Fetch Existing Support Circle ---
   const fetchSupportCircle = async () => {
     if (!userId || !token) {
         setLoading(false);
@@ -41,7 +40,6 @@ const SupportCircle = () => {
     fetchSupportCircle();
   }, [userId, token]);
 
-  // --- 2. Handle Adding New Contact ---
   const handleAddContact = async () => {
     if (!contactName || !contactPhone) {
       alert('Please enter both name and phone number.');
@@ -59,7 +57,7 @@ const SupportCircle = () => {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // CRUCIAL: Sending the token
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ name: contactName, phone: contactPhone }),
       });
@@ -68,7 +66,7 @@ const SupportCircle = () => {
 
       if (response.ok) {
         alert('Contact added successfully!');
-        setSupportCircle(data.supportCircle); // Update the local state with the new list
+        setSupportCircle(data.supportCircle);
         setContactName('');
         setContactPhone('');
       } else if (response.status === 401 || response.status === 400) {
@@ -82,9 +80,48 @@ const SupportCircle = () => {
     }
   };
 
+  const handleDeleteContact = async (contactId) => {
+    if (!token) {
+        alert('Session expired. Please log in.');
+        navigate('/login');
+        return;
+    }
+
+    if (!window.confirm("Are you sure you want to remove this contact?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/support-circle/${contactId}`, {
+            method: 'DELETE',
+            headers: { 
+                'Authorization': `Bearer ${token}` 
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Contact removed successfully!');
+            setSupportCircle(data.supportCircle);
+        } else if (response.status === 401 || response.status === 400) {
+            alert('Session expired. Please log in again.');
+            navigate('/login');
+        } else {
+            alert(`Failed to delete contact: ${data.message || 'Server Error'}`);
+        }
+    } catch (error) {
+        alert('Could not connect to the server.');
+    }
+  };
+
+
   return (
     <div className="support-circle-container">
       <div className="app-header">
+        <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', lineHeight: '1', position: 'absolute', left: '20px' }}>
+            « Back
+        </Link>
         <h1 className="screen-title">My Support Circle</h1>
         <div className="time-avatar">L</div> 
       </div>
@@ -93,22 +130,29 @@ const SupportCircle = () => {
         Add trusted contacts who will be notified when you need support
       </p>
 
-      {/* Contacts List Placeholder (Updated to show real contacts) */}
       <div className="contacts-list-placeholder">
         {loading ? (
             <p>Loading contacts...</p>
         ) : supportCircle.length > 0 ? (
-            supportCircle.map((contact, index) => (
-                <div key={index} className="actual-contact-item">
-                    👥 {contact.name} - {contact.phone}
-                </div>
-            ))
+            <div className="actual-contacts-list">
+                {supportCircle.map((contact) => (
+                    <div key={contact._id} className="actual-contact-item">
+                        <span className="contact-details">👥 {contact.name} - {contact.phone}</span>
+                        <button 
+                            className="delete-contact-button" 
+                            onClick={() => handleDeleteContact(contact._id)}
+                            aria-label={`Remove ${contact.name}`}
+                        >
+                            &times;
+                        </button>
+                    </div>
+                ))}
+            </div>
         ) : (
             "No contacts added yet"
         )}
       </div>
 
-      {/* Input Form for New Contacts */}
       <div className="contact-input-form">
         <input 
           type="text" 

@@ -4,13 +4,14 @@ import './Resources.css';
 const Resources = () => {
   return (
     <div className="resources-container">
-      {/* Header and Avatar */}
       <div className="app-header">
+        <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', lineHeight: '1', position: 'absolute', left: '20px' }}>
+            « Back
+        </Link>
         <h1 className="screen-title">Well-being Resources</h1>
         <div className="time-avatar">L</div> 
       </div>
 
-      {/* --- Immediate Help Section --- */}
       <div className="section-group">
         <h2 className="section-title">Immediate Help</h2>
         <div className="immediate-help-card">
@@ -19,24 +20,20 @@ const Resources = () => {
         </div>
       </div>
 
-      {/* --- Quick Mood Boosters Section --- */}
       <div className="section-group">
         <h2 className="section-title">Quick Mood Boosters</h2>
         <div className="mood-booster-list">
-          {/* Breathing Exercise -> Links to Mood Log */}
-          <Link to="/log-mood" className="booster-link">
+          <Link to="/breathing-exercise" className="booster-link">
             <button className="booster-button breathing">
               <span className="booster-icon">🌿</span> 5-Minute Breathing Exercise
             </button>
           </Link>
-          {/* Calming Music -> Links to Mood Log */}
-          <Link to="/log-mood" className="booster-link">
+          <a href="https://www.youtube.com/watch?v=tck7E11SdR8" target="_blank" rel="noopener noreferrer" className="booster-link">
             <button className="booster-button music">
               <span className="booster-icon">🎵</span> Calming Music Playlist
             </button>
-          </Link>
-          {/* Gratitude Journaling -> Links to Mood Log */}
-          <Link to="/log-mood" className="booster-link">
+          </a>
+          <Link to="/resources/journaling" className="booster-link">
             <button className="booster-button journaling">
               <span className="booster-icon">📓</span> Gratitude Journaling
             </button>
@@ -44,23 +41,20 @@ const Resources = () => {
         </div>
       </div>
 
-      {/* --- Educational Resources Section --- */}
       <div className="section-group">
         <h2 className="section-title">Educational Resources</h2>
         <p className="learn-more">Learn More</p>
         <div className="educational-list">
-          {/* Understanding Mental Health -> Links to Mood Log */}
-          <Link to="/log-mood" className="booster-link">
+          <a href="https://www.nimh.nih.gov/health/topics/child-and-adolescent-mental-health" target="_blank" rel="noopener noreferrer" className="booster-link">
             <button className="edu-button mental-health">
               <span className="edu-icon">📚</span> Understanding Mental Health
             </button>
-          </Link>
-          {/* Building Resilience -> Links to Mood Log */}
-          <Link to="/log-mood" className="booster-link">
+          </a>
+          <a href="https://jedfoundation.org/how-to-build-resilience-in-teens-and-young-adults/" target="_blank" rel="noopener noreferrer" className="booster-link">
             <button className="edu-button resilience">
               <span className="edu-icon">🎯</span> Building Resilience
             </button>
-          </Link>
+          </a>
         </div>
       </div>
     </div>
