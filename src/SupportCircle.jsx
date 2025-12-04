@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './SupportCircle.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'; // ADDED
+
 const SupportCircle = () => {
   const navigate = useNavigate();
   const [contactName, setContactName] = useState('');
@@ -19,7 +21,7 @@ const SupportCircle = () => {
     }
     
     try {
-      const response = await fetch(`http://localhost:5000/api/profile/${userId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, { // MODIFIED
           headers: {
               'Authorization': `Bearer ${token}` 
           }
@@ -53,7 +55,7 @@ const SupportCircle = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/support-circle', {
+      const response = await fetch(`${API_BASE_URL}/api/support-circle`, { // MODIFIED
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -92,7 +94,7 @@ const SupportCircle = () => {
     }
 
     try {
-        const response = await fetch(`http://localhost:5000/api/support-circle/${contactId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/support-circle/${contactId}`, { // MODIFIED
             method: 'DELETE',
             headers: { 
                 'Authorization': `Bearer ${token}` 

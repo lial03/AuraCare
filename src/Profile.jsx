@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Profile.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const Profile = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState({ 
@@ -19,7 +21,7 @@ const Profile = () => {
         if (!userId || !token) { return; }
         
         try {
-            const response = await fetch(`http://localhost:5000/api/profile/${userId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             }); 
             const data = await response.json();
@@ -50,7 +52,7 @@ const Profile = () => {
         e.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:5000/api/profile', {
+            const response = await fetch(`${API_BASE_URL}/api/profile`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

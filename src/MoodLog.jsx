@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './MoodLog.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const MoodLog = () => {
     const navigate = useNavigate();
     const [selectedMood, setSelectedMood] = useState('');
@@ -23,7 +25,6 @@ const MoodLog = () => {
         if (label === 'Mixed') {
             setNotes("I feel mixed because:\n\nGood thing 1: \nBad thing 1: \n\nI need to focus on:");
         } else if (selectedMood === 'Mixed') {
-            // Clear prompt if switching away from Mixed
             setNotes('');
         }
     };
@@ -45,7 +46,7 @@ const MoodLog = () => {
         const moodToSave = selectedMood === 'Mixed' ? 'Journal Entry' : selectedMood;
 
         try {
-            const response = await fetch('http://localhost:5000/api/moodlog', {
+            const response = await fetch(`${API_BASE_URL}/api/moodlog`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

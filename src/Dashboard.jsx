@@ -11,6 +11,8 @@ import {
 } from 'recharts';
 import './Dashboard.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'; 
+
 const moodToValue = (mood) => {
     switch (mood) {
         case 'Terrible': return 1;
@@ -45,7 +47,7 @@ const Dashboard = () => {
 
       const fetchUserName = async (currentUserId) => {
           try {
-              const profileResponse = await fetch(`http://localhost:5000/api/profile/${currentUserId}`, {
+              const profileResponse = await fetch(`${API_BASE_URL}/api/profile/${currentUserId}`, { 
                   headers: { 'Authorization': `Bearer ${token}` }
               });
               const profileData = await profileResponse.json();
@@ -67,8 +69,8 @@ const Dashboard = () => {
         const headers = { 'Authorization': `Bearer ${token}` };
 
         const [moodResponse, insightResponse] = await Promise.all([
-            fetch('http://localhost:5000/api/moodhistory', { headers }),
-            fetch('http://localhost:5000/api/insights', { headers })
+            fetch(`${API_BASE_URL}/api/moodhistory`, { headers }), 
+            fetch(`${API_BASE_URL}/api/insights`, { headers }) 
         ]);
         
         const moodData = await moodResponse.json();
@@ -110,7 +112,7 @@ const Dashboard = () => {
       }
 
       try {
-          const response = await fetch('http://localhost:5000/api/need-support', {
+          const response = await fetch(`${API_BASE_URL}/api/need-support`, {
               method: 'POST',
               headers: { 'Authorization': `Bearer ${token}` }
           });
@@ -118,7 +120,6 @@ const Dashboard = () => {
           const data = await response.json();
 
           if (response.ok) {
-              // The backend now returns contact data with emails
               navigate('/help-on-way', { state: { notifiedContacts: data.notifiedContacts } });
           } else if (response.status === 400 && data.message.includes('No contacts')) {
               alert('Please add contacts to your support circle before activating the signal.');

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const Journaling = () => {
     const navigate = useNavigate();
     const [notes, setNotes] = useState('');
@@ -20,7 +22,7 @@ const Journaling = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/moodlog', {
+            const response = await fetch(`${API_BASE_URL}/api/moodlog`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -34,7 +36,7 @@ const Journaling = () => {
 
             if (response.ok) {
                 alert('Journal entry saved successfully! View it in Past Entries.');
-                navigate('/journal-history'); // Direct to history view after saving new entry
+                navigate('/journal-history');
             } else {
                 alert('Failed to save journal entry. Check server logs.');
             }

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Dashboard.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const JournalHistory = () => {
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ const JournalHistory = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/journalhistory', {
+            const response = await fetch(`${API_BASE_URL}/api/journalhistory`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -44,7 +46,7 @@ const JournalHistory = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/moodlog/${logId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/moodlog/${logId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
