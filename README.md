@@ -1,51 +1,103 @@
-# AuraCare - Mental Health Support Web App
+# AuraCare: A Mental Health Support Web Application
 
-This project has been modified to replace the Twilio SMS notification system with an **Email Notification System** using **Nodemailer**.
+## 🌟 Project Overview
 
-## Changes Implemented
+**AuraCare** is a full-stack web application designed to provide proactive mental health support for adolescents and young adults. It bridges the gap between formal clinical services and informal peer support by offering a user-friendly, non-stigmatizing platform for daily emotional self-management.
 
-1.  **Backend (`AuraCare/backend/`)**:
+The core functionality of AuraCare revolves around three pillars:
 
-    - Removed `twilio` dependency and installed `nodemailer`.
-    - Created `emailService.js` to handle email sending logic.
-    - Updated `server.js` to import and use `emailService.sendSupportEmail` in the `/api/need-support` endpoint.
-    - The `SupportContactSchema` in `server.js` was updated to store `email` instead of `phone`.
-    - The `/api/support-circle` endpoints were updated to handle `email` instead of `phone`.
+1.  **Proactive Mood Tracking:** Users can log their daily mood and journal entries.
+2.  **Data-Driven Insights:** The application visualizes mood trends and generates context-aware insights to promote self-awareness.
+3.  **Automated Peer Support:** Users can register a trusted support circle and, in times of distress, automatically notify them via email with a single click.
 
-2.  **Frontend (`AuraCare/src/`)**:
-    - Updated `SupportCircle.jsx` to collect and display a contact's **Email** instead of their **Phone Number**.
-    - Updated `SupportCircle.css` to reflect the new input field class name.
-    - Updated the notification message in `SupportCircle.jsx` to indicate an **EMAIL** will be sent.
+This project was developed as part of the SWE3090A course, demonstrating proficiency in modern web development technologies and adherence to the principles outlined in the project proposal.
 
-## Setup and Configuration
+## 🚀 Key Features
 
-To run the application and test the new email feature, you must configure the email credentials in the backend's `.env` file.
+- **Secure Authentication:** User registration and login using email or phone number, secured with JWT and `bcrypt`.
+- **Mood Logging:** Simple interface for daily mood logging with optional notes.
+- **Personalized Dashboard:** Visualization of mood history and trends using **Recharts**.
+- **Dynamic Insights:** Algorithmic analysis of mood patterns to provide actionable, context-aware recommendations (e.g., identifying downward trends or potential triggers).
+- **Support Circle Management:** Ability to add and remove trusted contacts.
+- **Emergency Notification:** One-click activation to send an urgent email notification to the entire support circle.
+- **Journaling:** Dedicated space for private reflection and historical review of entries.
 
-1.  **Backend Dependencies**:
+## 🛠️ Technology Stack
 
-    - Navigate to `AuraCare/backend` and run `npm install`. (This has already been done for `nodemailer`).
+AuraCare is built on a modern MERN-stack architecture, ensuring a scalable, robust, and responsive application.
 
-2.  **Configure Email Credentials**:
+| Component          | Technology                      | Purpose                                                                              |
+| :----------------- | :------------------------------ | :----------------------------------------------------------------------------------- |
+| **Frontend**       | **React.js** (with Vite)        | Building the user interface and handling client-side logic.                          |
+| **Backend**        | **Node.js** with **Express.js** | Handling API endpoints, business logic, and server-side operations.                  |
+| **Database**       | **MongoDB** (via Mongoose)      | Flexible, scalable storage for user profiles, mood logs, and support contacts.       |
+| **Visualization**  | **Recharts**                    | Rendering interactive and informative mood trend charts.                             |
+| **Authentication** | **JWT** & **Bcrypt**            | Secure user session management and password hashing.                                 |
+| **Notification**   | **Nodemailer** & **Mailgun**    | Reliable, cost-effective service for sending urgent support notifications via email. |
 
-    - Edit the `.env` file located in `AuraCare/backend/`.
-    - Replace the placeholder values with your actual email credentials:
-      ```
-      # Email Service Credentials (for nodemailer)
-      # IMPORTANT: For Gmail, you must use an App Password, not your regular password.
-      # See: https://support.google.com/accounts/answer/185833
-      EMAIL_USER=your_email@gmail.com
-      EMAIL_PASS=your_app_password
-      ```
+## ⚙️ Installation and Setup
 
-3.  **Run the Application**:
-    - **Backend**: In the `AuraCare/backend` directory, run `node server.js` (or `npm run dev` if you have `nodemon`).
-    - **Frontend**: In the `AuraCare` root directory, run `npm install` and then `npm run dev` to start the React application.
+### Prerequisites
 
-## Testing the New Feature
+- Node.js (v18+)
+- MongoDB Instance (Local or Cloud-hosted, e.g., MongoDB Atlas)
 
-1.  Log in to the application.
-2.  Navigate to **My Support Circle**.
-3.  Add a new contact, providing their **Name** and **Email Address**.
-4.  Navigate to the **Dashboard**.
-5.  Click the **"I Need Support Now"** button.
-6.  The contact(s) you added should receive an email notification from the address configured in your `.env` file.
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/lial03/AuraCare.git
+cd AuraCare
+```
+
+### 2. Backend Setup
+
+```bash
+cd backend
+npm install
+```
+
+Create a `.env` file in the `backend` directory and add the following environment variables:
+
+```
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=a_strong_secret_key
+MAILGUN_SMTP_LOGIN=your_mailgun_smtp_login
+MAILGUN_SMTP_PASSWORD=your_mailgun_smtp_password
+MAILGUN_SENDER_EMAIL=your_sender_email@example.com
+```
+
+Run the backend server:
+
+```bash
+node server.js
+# or for development with auto-restart:
+# npm run dev
+```
+
+### 3. Frontend Setup
+
+```bash
+cd .. # Go back to the root AuraCare directory
+npm install
+```
+
+Create a `.env` file in the root `AuraCare` directory (for the frontend) and add the following:
+
+```
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+
+Run the frontend application:
+
+```bash
+npm run dev
+```
+
+The application will typically be available at `http://localhost:5173`.
+
+## 🤝 Contribution
+
+This project is maintained by [Lina Mukashumbusho].
+
+_Note: Replace bracketed placeholders with actual values._
