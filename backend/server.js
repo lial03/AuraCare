@@ -5,9 +5,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken'); 
 const helmet = require('helmet'); 
 require('dotenv').config(); 
-const axios = require('axios');
 
-const { sendSupportEmail } = require('./emailService');
+const { sendSupportEmail } = require('./emailService'); // Import email service
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI)
 const SupportContactSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
-}, { timestamps: true });
+});
 
 const UserSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
@@ -340,64 +339,23 @@ app.put('/api/profile', authenticateUser, async (req, res) => {
     }
 });
 
-// MODIFIED ROUTE: Automatically registers recipient with Mailgun API
 app.post('/api/support-circle', authenticateUser, async (req, res) => {
-    const { name, email } = req.body;
-    
-    // 1. Save contact to MongoDB
     try {
+        const { name, email } = req.body;
         const user = await User.findByIdAndUpdate(
             req.userId,
             { $push: { supportCircle: { name, email } } },
             { new: true, runValidators: true }
-        ).select('fullName supportCircle');
+        ).select('supportCircle');
 
         if (!user) { return res.status(404).json({ message: 'Error: Authenticated user not found in database.' }); }
-        
-        // 2. Automatically add recipient to Mailgun's Authorized Recipients list
-        const MAILGUN_API_ENDPOINT = `https://api.mailgun.net/v3/domains/${process.env.MAILGUN_SANDBOX_DOMAIN}/authorized_recipients`;
-        
-        // The Mailgun API requires Basic Auth: Base64(api:PRIVATE_API_KEY)
-        const auth = Buffer.from(`api:${process.env.MAILGUN_API_KEY}`).toString('base64');
-        
-        await axios.post(
-            MAILGUN_API_ENDPOINT, 
-            `email=${encodeURIComponent(email)}`, // Use x-www-form-urlencoded format for the body
-            {
-                headers: {
-                    'Authorization': `Basic ${auth}`,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            }
-        );
-        
-        // Return a success message to the frontend
-        res.status(200).json({ 
-            message: 'Contact added and Mailgun verification email sent.', 
-            supportCircle: user.supportCircle 
-        });
-        
-    } catch (error) {
-        // Log the Mailgun API error for debugging
-        if (axios.isAxiosError(error) && error.response) {
-             console.error('Mailgun API Error:', error.response.data);
-        } else {
-             console.error('Failed to add contact or contact to Mailgun:', error);
-        }
 
-        if (error.name === 'ValidationError') { 
-            return res.status(400).json({ message: 'Validation failed: Contact name and email are required.' }); 
-        } 
-        
-        // Return a success to the client for the Mongo save, even if Mailgun failed,
-        // so the user still has the contact saved in their support circle.
-        res.status(200).json({ 
-            message: 'Contact added, but Mailgun verification step failed. Check server logs.', 
-            supportCircle: user.supportCircle 
-        });
+        res.status(200).json({ message: 'Contact added', supportCircle: user.supportCircle });
+    } catch (error) {
+        if (error.name === 'ValidationError') { return res.status(400).json({ message: 'Validation failed: Contact name and email are required.' }); } // Updated error message
+        res.status(500).json({ message: 'Failed to add contact: Internal server error' });
     }
 });
-// END MODIFIED ROUTE
 
 app.delete('/api/support-circle/:contactId', authenticateUser, async (req, res) => {
     try {
