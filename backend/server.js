@@ -11,8 +11,17 @@ const { sendSupportEmail } = require('./emailService'); // Import email service
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// CORS Configuration - Added explicit allowed origin to fix CORS error
+const allowedOrigin = 'https://auracare-kappa.vercel.app'; // Replace with your actual frontend URL if it changes
+const corsOptions = {
+    origin: allowedOrigin,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    optionsSuccessStatus: 204
+};
+
 app.use(helmet()); 
-app.use(cors());
+app.use(cors(corsOptions)); // <-- USING CONFIGURATION TO ALLOW FRONTEND
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
