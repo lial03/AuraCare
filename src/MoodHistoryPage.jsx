@@ -41,13 +41,10 @@ const MoodHistoryPage = () => {
     return (
         <div className="dashboard-container">
             <div className="app-header">
-                {/* Back link is anchored left by position: absolute */}
                 <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', lineHeight: '1', position: 'absolute', left: '20px' }}>
                     « Back
                 </Link>
-                {/* Title is centered by position: absolute and transform */}
                 <h1 className="screen-title" style={{ maxWidth: '65%', fontSize: '24px' }}>Recent Moods & Notes</h1>
-                {/* Avatar is anchored right by position: absolute */}
                 <div className="time-avatar">L</div>
             </div>
             

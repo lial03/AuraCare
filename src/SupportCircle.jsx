@@ -5,7 +5,7 @@ import './SupportCircle.css';
 const SupportCircle = () => {
   const navigate = useNavigate();
   const [contactName, setContactName] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState(''); 
   const [supportCircle, setSupportCircle] = useState([]); 
   const [loading, setLoading] = useState(true);
 
@@ -41,8 +41,8 @@ const SupportCircle = () => {
   }, [userId, token]);
 
   const handleAddContact = async () => {
-    if (!contactName || !contactPhone) {
-      alert('Please enter both name and phone number.');
+    if (!contactName || !contactEmail) {
+      alert('Please enter both name and email address.');
       return;
     }
     
@@ -59,7 +59,7 @@ const SupportCircle = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name: contactName, phone: contactPhone }),
+        body: JSON.stringify({ name: contactName, email: contactEmail }), 
       });
 
       const data = await response.json();
@@ -68,7 +68,7 @@ const SupportCircle = () => {
         alert('Contact added successfully!');
         setSupportCircle(data.supportCircle);
         setContactName('');
-        setContactPhone('');
+        setContactEmail(''); 
       } else if (response.status === 401 || response.status === 400) {
           alert('Session expired. Please log in again.');
           navigate('/login');
@@ -137,7 +137,8 @@ const SupportCircle = () => {
             <div className="actual-contacts-list">
                 {supportCircle.map((contact) => (
                     <div key={contact._id} className="actual-contact-item">
-                        <span className="contact-details">👥 {contact.name} - {contact.phone}</span>
+	                        <span className="contact-details">👥 {contact.name} - {contact.email}</span> 
+
                         <button 
                             className="delete-contact-button" 
                             onClick={() => handleDeleteContact(contact._id)}
@@ -161,22 +162,24 @@ const SupportCircle = () => {
           value={contactName}
           onChange={(e) => setContactName(e.target.value)}
         />
-        <input 
-          type="tel" 
-          placeholder="Phone Number" 
-          className="form-input-phone"
-          value={contactPhone}
-          onChange={(e) => setContactPhone(e.target.value)}
-        />
+	        <input 
+	          type="email" 
+	          placeholder="Contact Email"
+	          className="form-input-email" 
+	          value={contactEmail}
+	          onChange={(e) => setContactEmail(e.target.value)} 
+	        />
+
         
         <button className="add-to-circle-button" onClick={handleAddContact}>
           Add To My Circle
         </button>
       </div>
 
-      <p className="notification-note">
-        These contacts will receive an SMS when you use 'I Need Support Now'
-      </p>
+	      <p className="notification-note">
+	        These contacts will receive an **EMAIL** when you use 'I Need Support Now'
+	      </p>
+
     </div>
   );
 };

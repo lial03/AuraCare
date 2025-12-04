@@ -4,6 +4,7 @@ import './EmergencyNotification.css';
 const EmergencyNotification = () => {
   const location = useLocation();
   const notifiedContacts = location.state?.notifiedContacts || []; 
+  // The backend now returns 'email' instead of 'phone' in the notifiedContacts array.
   
   const getIcon = (name) => {
     if (name.toLowerCase().includes('mom') || name.toLowerCase().includes('dad') || name.toLowerCase().includes('parent')) return '👨‍👩‍👧‍👦';
@@ -26,7 +27,8 @@ const EmergencyNotification = () => {
             notifiedContacts.map((contact, index) => (
               <div key={contact._id || index} className="contact-status">
                 <span className="contact-icon">{getIcon(contact.name)}</span>
-                <span className="contact-name">{contact.name}</span>
+                {/* UPDATED: Display email here */}
+                <span className="contact-name">{contact.name} ({contact.email})</span> 
                 <span className="notification-status">
                   Notified 
                   <span className="check-mark">✔</span>

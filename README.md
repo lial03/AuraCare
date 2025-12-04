@@ -1,89 +1,51 @@
-<<<<<<< HEAD
-# React + Vite
+# AuraCare - Mental Health Support Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project has been modified to replace the Twilio SMS notification system with an **Email Notification System** using **Nodemailer**.
 
-Currently, two official plugins are available:
+## Changes Implemented
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1.  **Backend (`AuraCare/backend/`)**:
 
-## React Compiler
+    - Removed `twilio` dependency and installed `nodemailer`.
+    - Created `emailService.js` to handle email sending logic.
+    - Updated `server.js` to import and use `emailService.sendSupportEmail` in the `/api/need-support` endpoint.
+    - The `SupportContactSchema` in `server.js` was updated to store `email` instead of `phone`.
+    - The `/api/support-circle` endpoints were updated to handle `email` instead of `phone`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2.  **Frontend (`AuraCare/src/`)**:
+    - Updated `SupportCircle.jsx` to collect and display a contact's **Email** instead of their **Phone Number**.
+    - Updated `SupportCircle.css` to reflect the new input field class name.
+    - Updated the notification message in `SupportCircle.jsx` to indicate an **EMAIL** will be sent.
 
-## Expanding the ESLint configuration
+## Setup and Configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# Getting Started with Create React App
+To run the application and test the new email feature, you must configure the email credentials in the backend's `.env` file.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1.  **Backend Dependencies**:
 
-## Available Scripts
+    - Navigate to `AuraCare/backend` and run `npm install`. (This has already been done for `nodemailer`).
 
-In the project directory, you can run:
+2.  **Configure Email Credentials**:
 
-### `npm start`
+    - Edit the `.env` file located in `AuraCare/backend/`.
+    - Replace the placeholder values with your actual email credentials:
+      ```
+      # Email Service Credentials (for nodemailer)
+      # IMPORTANT: For Gmail, you must use an App Password, not your regular password.
+      # See: https://support.google.com/accounts/answer/185833
+      EMAIL_USER=your_email@gmail.com
+      EMAIL_PASS=your_app_password
+      ```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+3.  **Run the Application**:
+    - **Backend**: In the `AuraCare/backend` directory, run `node server.js` (or `npm run dev` if you have `nodemon`).
+    - **Frontend**: In the `AuraCare` root directory, run `npm install` and then `npm run dev` to start the React application.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Testing the New Feature
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
->>>>>>> 8a0beeb736eb29186c98188842ddc4ba98432455
+1.  Log in to the application.
+2.  Navigate to **My Support Circle**.
+3.  Add a new contact, providing their **Name** and **Email Address**.
+4.  Navigate to the **Dashboard**.
+5.  Click the **"I Need Support Now"** button.
+6.  The contact(s) you added should receive an email notification from the address configured in your `.env` file.

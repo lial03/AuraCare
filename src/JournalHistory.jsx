@@ -51,7 +51,6 @@ const JournalHistory = () => {
 
             if (response.ok) {
                 alert('Journal entry deleted successfully!');
-                // Refresh the list immediately by filtering out the deleted entry
                 setEntries(prevEntries => prevEntries.filter(entry => entry._id !== logId));
             } else {
                 const errorData = await response.json();

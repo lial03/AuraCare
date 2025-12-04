@@ -78,7 +78,6 @@ const SignUp = () => {
             </span> 
           </div>
 
-          {/* CRITICAL: Logic attached directly to onClick */}
           <button type="button" className="signup-button" onClick={handleSignUp}>
             Create My Safe Space
           </button>

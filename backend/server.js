@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const helmet = require('helmet'); 
 require('dotenv').config(); 
 
+const { sendSupportEmail } = require('./emailService'); // Import email service
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -19,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 const SupportContactSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    phone: { type: String, required: true },
+    email: { type: String, required: true },
 });
 
 const UserSchema = new mongoose.Schema({
@@ -57,42 +59,111 @@ const generateDynamicInsights = (moodHistory) => {
         return null;
     }
     
-    let totalWeekdayMood = 0;
-    let totalWeekendMood = 0;
-    let weekdayCount = 0;
-    let weekendCount = 0;
-
-    moodHistory.forEach(log => {
-        const value = moodToValue(log.mood);
-        const dayOfWeek = new Date(log.createdAt).getDay(); 
-        
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-            totalWeekendMood += value;
-            weekendCount++;
-        } else {
-            totalWeekdayMood += value;
-            weekdayCount++;
-        }
-    });
-
-    const avgWeekday = weekdayCount > 0 ? totalWeekdayMood / weekdayCount : 0;
-    const avgWeekend = weekendCount > 0 ? totalWeekendMood / weekendCount : 0;
+    // Convert all moods to a numerical value array
+    const numericalHistory = moodHistory.map(log => moodToValue(log.mood));
     
-    let insightText = "Focus on consistency this week!";
-    let patternText = "Try a 5-minute break around 3 PM.";
+    let finalInsight = {};
+    let isTrendIdentified = false;
 
-    if (avgWeekday > avgWeekend + 0.5) {
-        insightText = "You thrive on structure! Weekday moods are higher. Try to plan activities on weekends.";
-        patternText = "Your mood dips on the weekend. Plan a social call on Saturday!";
-    } else if (avgWeekend > avgWeekday + 0.5) {
-        insightText = "You love relaxation! Weekend moods are highest. Look for quick ways to de-stress during the week.";
-        patternText = "Your mood dips during the workweek. Take a short walk at lunch.";
-    } else {
-        insightText = "Your mood is stable! Keep up the good work and log those notes.";
-        patternText = "Focus on logging notes to find micro-patterns!";
+    // --- 1. Recent Trend Analysis (Past 3 days vs. Previous Period) ---
+    const recentEntries = numericalHistory.slice(0, 3);
+    const earlierEntries = numericalHistory.slice(3, 10);
+    
+    const avgRecent = recentEntries.reduce((sum, val) => sum + val, 0) / recentEntries.length;
+
+    if (earlierEntries.length >= 3) {
+        const avgEarlier = earlierEntries.reduce((sum, val) => sum + val, 0) / earlierEntries.length;
+        const trendDifference = avgRecent - avgEarlier;
+
+        if (trendDifference < -0.5) {
+            // Significant Downward Trend (High Priority Alert)
+            finalInsight = { 
+                insightText: "Alert: Your mood is trending DOWN. 😔", 
+                patternText: "We recommend taking a break now. Try the breathing exercise!",
+            };
+            isTrendIdentified = true;
+        } else if (trendDifference > 0.5) {
+            // Significant Upward Trend
+            finalInsight = { 
+                insightText: "Great job! Your mood is trending UP! 🎉", 
+                patternText: "What are you doing differently? Keep it up and log those details.",
+            };
+            isTrendIdentified = true;
+        }
     }
 
-    return { insightText, patternText };
+    // --- 2. Low Mood Trigger Spotting (If no critical trend, check for triggers) ---
+    if (!isTrendIdentified) {
+        const lowestMoodLogs = moodHistory
+            .filter(log => moodToValue(log.mood) <= 2 && log.notes)
+            .sort((a, b) => moodToValue(a.mood) - moodToValue(b.mood));
+
+        if (lowestMoodLogs.length > 0) {
+            const lowestNote = lowestMoodLogs[0].notes ? lowestMoodLogs[0].notes.toLowerCase() : '';
+            let trigger = null;
+
+            if (lowestNote.includes('work') || lowestNote.includes('school') || lowestNote.includes('stress')) {
+                trigger = "Stress from responsibilities might be the cause.";
+            } else if (lowestNote.includes('social') || lowestNote.includes('friend') || lowestNote.includes('partner')) {
+                trigger = "Recent social stress or relationship issues were noted.";
+            } else if (lowestNote.includes('tired') || lowestNote.includes('sleep')) {
+                trigger = "Fatigue or poor sleep seems to be a recurring factor.";
+            }
+
+            if (trigger) { 
+                finalInsight = { 
+                    insightText: "Potential Trigger Spotted:", 
+                    patternText: trigger + " Try journaling about it.",
+                };
+            }
+        }
+    }
+    
+    // --- 3. Weekday/Weekend Structural Analysis (Fallback) ---
+    if (Object.keys(finalInsight).length === 0) {
+        let totalWeekdayMood = 0;
+        let totalWeekendMood = 0;
+        let weekdayCount = 0;
+        let weekendCount = 0;
+
+        moodHistory.forEach(log => {
+            const value = moodToValue(log.mood);
+            const dayOfWeek = new Date(log.createdAt).getDay(); 
+            
+            if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday (0) or Saturday (6)
+                totalWeekendMood += value;
+                weekendCount++;
+            } else {
+                totalWeekdayMood += value;
+                weekdayCount++;
+            }
+        });
+
+        const avgWeekday = weekdayCount > 0 ? totalWeekdayMood / weekdayCount : 0;
+        const avgWeekend = weekendCount > 0 ? totalWeekendMood / weekendCount : 0;
+        
+        if (Math.abs(avgWeekday - avgWeekend) > 0.5) { // Significant difference
+            if (avgWeekday > avgWeekend) {
+                finalInsight = { 
+                    insightText: "You thrive on structure! Weekday moods are higher.", 
+                    patternText: "Try to plan a social activity or hobby on the weekend.",
+                };
+            } else {
+                finalInsight = { 
+                    insightText: "You love relaxation! Weekend moods are highest.", 
+                    patternText: "Look for quick 5-minute ways to de-stress during the workweek.",
+                };
+            }
+        } else {
+            // Default stable message
+            finalInsight = { 
+                insightText: "Your mood is stable and consistent!", 
+                patternText: "Keep logging notes to find micro-patterns that lead to good days.",
+            };
+        }
+    }
+    
+    return { hasData: true, insightText: finalInsight.insightText, patternText: finalInsight.patternText };
 };
 
 
@@ -270,10 +341,10 @@ app.put('/api/profile', authenticateUser, async (req, res) => {
 
 app.post('/api/support-circle', authenticateUser, async (req, res) => {
     try {
-        const { name, phone } = req.body;
+        const { name, email } = req.body;
         const user = await User.findByIdAndUpdate(
             req.userId,
-            { $push: { supportCircle: { name, phone } } },
+            { $push: { supportCircle: { name, email } } },
             { new: true, runValidators: true }
         ).select('supportCircle');
 
@@ -281,7 +352,7 @@ app.post('/api/support-circle', authenticateUser, async (req, res) => {
 
         res.status(200).json({ message: 'Contact added', supportCircle: user.supportCircle });
     } catch (error) {
-        if (error.name === 'ValidationError') { return res.status(400).json({ message: 'Validation failed: Contact name and phone are required.' }); }
+        if (error.name === 'ValidationError') { return res.status(400).json({ message: 'Validation failed: Contact name and email are required.' }); } // Updated error message
         res.status(500).json({ message: 'Failed to add contact: Internal server error' });
     }
 });
@@ -319,15 +390,25 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
         }
         
         let sentCount = 0;
+        let failedCount = 0;
         
         for (const contact of user.supportCircle) {
-            console.log(`[MOCK SMS] Sending to ${contact.name} (${contact.phone}): ${user.fullName} needs support now. Please reach out.`);
-            sentCount++;
+            const emailSent = await sendSupportEmail(contact.email, contact.name, user.fullName);
+            
+            if (emailSent) {
+                sentCount++;
+            } else {
+                failedCount++;
+            }
         }
         
+        const message = failedCount > 0 
+            ? `Emergency signal sent. ${sentCount} contact(s) notified via email. ${failedCount} email(s) failed to send.`
+            : `Emergency signal sent. ${sentCount} contact(s) notified via email.`;
+
         res.status(200).json({ 
-            message: `Emergency signal sent. ${sentCount} contact(s) notified.`,
-            notifiedContacts: user.supportCircle.map(c => ({ name: c.name, phone: c.phone, _id: c._id }))
+            message: message,
+            notifiedContacts: user.supportCircle.map(c => ({ name: c.name, email: c.email, _id: c._id })) // Changed phone to email
         });
 
     } catch (error) {

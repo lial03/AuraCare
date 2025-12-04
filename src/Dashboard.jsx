@@ -118,6 +118,7 @@ const Dashboard = () => {
           const data = await response.json();
 
           if (response.ok) {
+              // The backend now returns contact data with emails
               navigate('/help-on-way', { state: { notifiedContacts: data.notifiedContacts } });
           } else if (response.status === 400 && data.message.includes('No contacts')) {
               alert('Please add contacts to your support circle before activating the signal.');
@@ -209,7 +210,7 @@ const Dashboard = () => {
           <div className="insight-card-1">
             <span className="insight-icon">📈</span>
             <p className="insight-text">
-              <span className="bold-label">This Week's Insight</span>
+              <span className="bold-label">Mood Status:</span> {/* Dynamic Title 1 */}
               <br/>
               {insights.insightText}
             </p>
@@ -218,7 +219,9 @@ const Dashboard = () => {
           <div className="insight-card-2">
             <span className="insight-icon">😜</span>
             <p className="insight-text">
-              <span className="bold-label">Your Pattern:</span> {insights.patternText}
+              <span className="bold-label">Actionable Insight:</span> {/* Dynamic Title 2 */}
+              <br/>
+              {insights.patternText}
             </p>
           </div>
         </div>

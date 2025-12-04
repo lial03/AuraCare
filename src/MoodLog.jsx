@@ -16,7 +16,7 @@ const MoodLog = () => {
         { emoji: '☯️', label: 'Mixed' },
     ];
     
-    // --- New Functionality: Handle Mood Selection with Guided Prompt ---
+    // --- Handle Mood Selection with Guided Prompt ---
     const handleSelectMood = (label) => {
         setSelectedMood(label);
         
