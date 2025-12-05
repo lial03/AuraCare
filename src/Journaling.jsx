@@ -8,6 +8,8 @@ const Journaling = () => {
     const navigate = useNavigate();
     const [notes, setNotes] = useState('');
     const [userName, setUserName] = useState('User');
+    const [analysisResult, setAnalysisResult] = useState(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
     
     useEffect(() => {
         const fetchUserName = async () => {
@@ -44,29 +46,52 @@ const Journaling = () => {
             navigate('/login');
             return;
         }
+        
+        setIsAnalyzing(true); // Start analysis
+        setAnalysisResult(null);
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/moodlog`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ 
-                    mood: 'Journal Entry',
-                    notes: notes 
-                }),
-            });
-
-            if (response.ok) {
-                alert('Journal entry saved successfully! View it in Past Entries.');
-                navigate('/journal-history');
-            } else {
-                alert('Failed to save journal entry. Check server logs.');
-            }
-        } catch (error) {
-            alert('Could not connect to the server.');
+        // 1. Save the journal entry
+        const logResponse = await fetch(`${API_BASE_URL}/api/moodlog`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+                mood: 'Journal Entry',
+                notes: notes 
+            }),
+        });
+        
+        if (!logResponse.ok) {
+            alert('Failed to save journal entry. Check server logs.');
+            setIsAnalyzing(false);
+            return;
         }
+        
+        // 2. Perform AI analysis on the notes
+        const analysisResponse = await fetch(`${API_BASE_URL}/api/analyze-journal`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ notes: notes }),
+        });
+        
+        const analysisData = await analysisResponse.json();
+        setIsAnalyzing(false);
+        
+        if (analysisResponse.ok) {
+            setAnalysisResult(analysisData);
+            // Don't navigate yet, let the user see the analysis!
+        } else {
+            alert(`Journal entry saved, but AI analysis failed: ${analysisData.message || 'Server error'}`);
+        }
+    };
+
+    const handleExit = () => {
+        navigate('/journal-history');
     };
 
     return (
@@ -97,15 +122,52 @@ const Journaling = () => {
                         color: '#2D2D2D',
                         resize: 'none'
                     }}
+                    disabled={analysisResult} // Disable editing after saving
                 ></textarea>
             </div>
+            
+            {/* --- Analysis Output --- */}
+            {isAnalyzing && (
+                 <div className="content-card" style={{ textAlign: 'center', backgroundColor: '#E8F5E9', borderLeft: '5px solid #2E7D32' }}>
+                    <h3 className="section-heading" style={{ marginTop: '0', marginBottom: '5px', color: '#2E7D32' }}>Analyzing Your Entry...</h3>
+                    <p style={{ color: '#2E7D32' }}>The AI is generating insights. Please wait a moment.</p>
+                </div>
+            )}
+            
+            {analysisResult && (
+                <div className="content-card" style={{ backgroundColor: '#E0E0FF', borderLeft: '5px solid #8B5FBF' }}>
+                    <h2 className="section-heading" style={{ marginTop: '0', color: '#8B5FBF' }}>AI Entry Analysis Complete!</h2>
+                    
+                    <p style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#2D2D2D', fontWeight: '600' }}>
+                        Summary: <span style={{ fontWeight: '400' }}>{analysisResult.summary}</span>
+                    </p>
+                    <p style={{ margin: '0 0 5px 0', fontSize: '16px', color: '#2D2D2D', fontWeight: '600' }}>
+                        Tone Detected: <span style={{ fontWeight: '400', padding: '3px 8px', backgroundColor: '#F8F8F8', borderRadius: '4px' }}>{analysisResult.tone}</span>
+                    </p>
+                    <p style={{ margin: '0', fontSize: '16px', color: '#2D2D2D', fontWeight: '600' }}>
+                        Primary Theme: <span style={{ fontWeight: '400', padding: '3px 8px', backgroundColor: '#F8F8F8', borderRadius: '4px' }}>{analysisResult.theme}</span>
+                    </p>
+                    
+                    <p style={{ marginTop: '15px', fontSize: '14px', color: '#6B6B6B' }}>
+                        This analysis is for your reflection only. Your journal remains private.
+                    </p>
+                </div>
+            )}
+
 
             <div className="button-group">
-                <button className="btn-primary" onClick={handleSave}>
-                    Save & Exit
-                </button>
+                {!analysisResult ? (
+                    <button className="btn-primary" onClick={handleSave} disabled={isAnalyzing}>
+                        {isAnalyzing ? "Saving & Analyzing..." : "Save & Analyze Entry"}
+                    </button>
+                ) : (
+                    <button className="btn-primary" onClick={handleExit}>
+                        Journal Entry Saved. Go to History »
+                    </button>
+                )}
+                
                 <Link to="/journal-history" style={{ textDecoration: 'none' }}>
-                    <button className="btn-secondary">
+                    <button className="btn-secondary" disabled={isAnalyzing}>
                         View Past Entries
                     </button>
                 </Link>

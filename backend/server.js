@@ -11,6 +11,7 @@ const { sendSupportEmail } = require('./emailService'); // Import email service
 // --- NEW: AI SDK Setup ---
 const { GoogleGenAI } = require('@google/genai');
 const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY }); 
+// --- END NEW: AI SDK Setup ---
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -76,9 +77,8 @@ const MoodLogSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const MoodLog = mongoose.model('MoodLog', MoodLogSchema);
 
-// --- NEW: AI Insight Generation Logic ---
+// --- AI Insight Generation Logic ---
 const formatHistoryForLLM = (moodHistory) => {
-    // We send the last 7 mood entries with notes
     return moodHistory.slice(0, 7).map(entry => 
         `Mood: ${entry.mood}, Notes: "${entry.notes || 'No notes provided.'}", Date: ${new Date(entry.createdAt).toDateString()}`
     ).join('\n');
@@ -142,7 +142,7 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
 
     } catch (error) {
         // Log the full error to your server console but send a gentle message to the user
-        console.error("AI Insight Generation Failed:", error.message); 
+        console.error("AI Dashboard Insight Generation Failed:", error.message); 
         return { 
             hasData: true, 
             insightText: "An AI check-in failed, but your data is safe. 🥺", 
@@ -150,7 +150,61 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
         };
     }
 };
-// --- END NEW: AI Insight Generation Logic ---
+
+
+// --- AI Insight Generation Logic (Journal Analysis) ---
+
+/**
+ * Uses the Gemini API to analyze raw journal text for tone and theme.
+ */
+const analyzeJournalEntryAI = async (notes) => {
+    
+    const jsonSchema = {
+        type: "object",
+        properties: {
+            tone: { type: "string", description: "The single most dominant emotion or tone in the text (e.g., Anxious, Hopeful, Frustrated, Reflective)." },
+            theme: { type: "string", description: "The primary subject or theme of the entry (e.g., Work Stress, Social Life, Self-Care, Personal Growth)." },
+            summary: { type: "string", description: "A one-sentence, empathetic summary of the user's entry."}
+        },
+        required: ["tone", "theme", "summary"]
+    };
+
+    const prompt = `
+        You are an empathetic listener and mental health analyst for AuraCare.
+        Analyze the following user journal entry:
+        ---
+        ${notes}
+        ---
+
+        Return a JSON object with the following analysis:
+        1. **tone**: The dominant emotion.
+        2. **theme**: The main subject of the entry.
+        3. **summary**: A one-sentence, empathetic summary of the content.
+        
+        The final response MUST be a valid JSON object matching the requested schema.
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: jsonSchema,
+            }
+        });
+        
+        return JSON.parse(response.text);
+
+    } catch (error) {
+        console.error("Journal Analysis Failed:", error.message); 
+        return { 
+            tone: "Neutral", 
+            theme: "Reflection", 
+            summary: "Could not perform in-depth AI analysis, but your entry has been saved securely." 
+        };
+    }
+};
 
 
 const authenticateUser = (req, res, next) => {
@@ -270,6 +324,19 @@ app.get('/api/journalhistory', authenticateUser, async (req, res) => {
         res.status(200).json(history);
     } catch (error) {
         res.status(500).json({ message: 'Failed to retrieve journal history', error: error.message });
+    }
+});
+
+app.post('/api/analyze-journal', authenticateUser, async (req, res) => {
+    try {
+        const { notes } = req.body;
+        if (!notes) { return res.status(400).json({ message: 'No notes provided for analysis.' }); }
+
+        const analysis = await analyzeJournalEntryAI(notes);
+        res.status(200).json(analysis);
+
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to analyze journal entry.', error: error.message });
     }
 });
 
@@ -569,7 +636,7 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
 
         res.status(200).json({ 
             message: message,
-            contactReports: contactReports, // Renamed to contactReports for clarity
+            contactReports: contactReports,
             unverifiedContacts: unverifiedContacts
         });
 
