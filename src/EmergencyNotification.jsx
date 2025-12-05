@@ -5,11 +5,14 @@ import './PageLayout.css';
 const EmergencyNotification = () => {
   const location = useLocation();
   const notifiedContacts = location.state?.notifiedContacts || [];
+  const unverifiedContacts = location.state?.unverifiedContacts || [];
   
   const getIcon = (name) => {
     if (name.toLowerCase().includes('mom') || name.toLowerCase().includes('dad') || name.toLowerCase().includes('parent')) return '👨‍👩‍👧‍👦';
     return '🫂'; 
   };
+
+  const hasUnverifiedEmails = unverifiedContacts.length > 0;
 
   return (
     <div className="emergency-container">
@@ -21,12 +24,58 @@ const EmergencyNotification = () => {
         We've notified your support circle ({notifiedContacts.length} contact{notifiedContacts.length !== 1 ? 's' : ''}).
       </p>
 
+      {hasUnverifiedEmails && (
+        <div style={{ 
+          backgroundColor: '#FFF3CD', 
+          border: '2px solid #FFC107',
+          borderRadius: '12px',
+          padding: '15px',
+          marginBottom: '20px',
+          textAlign: 'center'
+        }}>
+          <p style={{ 
+            fontSize: '14px', 
+            color: '#856404', 
+            margin: '0',
+            fontWeight: '600'
+          }}>
+            ⚠️ Warning: {unverifiedContacts.length} contact{unverifiedContacts.length !== 1 ? 's have' : ' has'} unverified email address{unverifiedContacts.length !== 1 ? 'es' : ''}.
+          </p>
+          <p style={{ 
+            fontSize: '13px', 
+            color: '#856404', 
+            margin: '8px 0 0 0'
+          }}>
+            Support signals may not be delivered to: <strong>{unverifiedContacts.join(', ')}</strong>
+          </p>
+          <p style={{ 
+            fontSize: '13px', 
+            color: '#856404', 
+            margin: '8px 0 0 0'
+          }}>
+            Please ask them to verify their email addresses in your Support Circle settings.
+          </p>
+        </div>
+      )}
+
       <div className="notified-card">
         {notifiedContacts.length > 0 ? (
             notifiedContacts.map((contact, index) => (
               <div key={contact._id || index} className="contact-status">
                 <span className="contact-icon">{getIcon(contact.name)}</span>
-                <span className="contact-name">{contact.name} ({contact.email})</span> 
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  <span className="contact-name">{contact.name} ({contact.email})</span>
+                  {!contact.emailVerified && (
+                    <span style={{ 
+                      fontSize: '11px', 
+                      color: '#FF6B6B', 
+                      fontWeight: '600',
+                      marginTop: '2px'
+                    }}>
+                      ⚠️ Email not verified
+                    </span>
+                  )}
+                </div>
                 <span className="notification-status">
                   Notified 
                   <span className="check-mark">✔</span>
@@ -51,6 +100,11 @@ const EmergencyNotification = () => {
         <Link to="/breathing-exercise" style={{ textDecoration: 'none' }}>
           <button className="btn-primary">
             Try a Quick Breathing Exercise
+          </button>
+        </Link>
+        <Link to="/support-circle" style={{ textDecoration: 'none' }}>
+          <button className="btn-secondary" style={{ backgroundColor: '#8B5FBF', color: 'white' }}>
+            Manage Support Circle
           </button>
         </Link>
         <Link to="/dashboard" style={{ textDecoration: 'none' }}>

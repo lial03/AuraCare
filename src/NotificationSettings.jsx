@@ -1,19 +1,127 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './PageLayout.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const NotificationSettings = () => {
+  const navigate = useNavigate();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [moodReminders, setMoodReminders] = useState(true);
   const [supportAlerts, setSupportAlerts] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleSave = () => {
-    // In a real app, this would send to the backend
-    // For now, we'll just show a success message
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const token = localStorage.getItem('authToken');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/notification-settings`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          const settings = data.notificationSettings;
+          setEmailNotifications(settings.emailNotifications);
+          setMoodReminders(settings.moodReminders);
+          setSupportAlerts(settings.supportAlerts);
+        } else if (response.status === 401) {
+          alert('Session expired. Please log in again.');
+          navigate('/login');
+        } else {
+          setError('Failed to load notification settings.');
+        }
+      } catch (error) {
+        console.error('Error fetching notification settings:', error);
+        setError('Could not connect to the server.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, [token, navigate]);
+
+  const handleSave = async () => {
+    if (!token) {
+      alert('Session expired. Please log in.');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notification-settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          emailNotifications,
+          moodReminders,
+          supportAlerts
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else if (response.status === 401) {
+        alert('Session expired. Please log in again.');
+        navigate('/login');
+      } else {
+        alert(`Failed to save settings: ${data.message || 'Server error'}`);
+      }
+    } catch (error) {
+      console.error('Error saving notification settings:', error);
+      alert('Could not connect to the server.');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <Link to="/profile" className="back-button-link">« Back to Profile</Link>
+        <h1 className="page-title">🔔 Notification Settings</h1>
+        <p style={{ textAlign: 'center', color: '#6B6B6B', padding: '40px' }}>Loading settings...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <Link to="/profile" className="back-button-link">« Back to Profile</Link>
+        <h1 className="page-title">🔔 Notification Settings</h1>
+        <div style={{ 
+          backgroundColor: '#FFE6E6', 
+          color: '#D32F2F', 
+          padding: '15px', 
+          borderRadius: '12px', 
+          marginBottom: '20px',
+          textAlign: 'center'
+        }}>
+          {error}
+        </div>
+        <div className="button-group">
+          <Link to="/profile" style={{ textDecoration: 'none' }}>
+            <button className="btn-secondary">Back to Profile</button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">

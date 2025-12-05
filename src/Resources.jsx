@@ -37,10 +37,92 @@ const Resources = () => {
       <h1 className="page-title">💡 Well-being Resources</h1>
 
       <div className="section-group">
-        <h2 className="section-heading">Immediate Help</h2>
-        <div className="immediate-help-card">
-          <p className="helpline-number">Crisis Helpline: 1-800-273-8255</p>
-          <p className="helpline-note">Available 24/7 - You're not alone</p>
+        <h2 className="section-heading">🆘 Kenya Mental Health Emergency Contacts</h2>
+        
+        <div className="emergency-contacts-grid" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: '15px', 
+          marginBottom: '20px' 
+        }}>
+          <div className="immediate-help-card" style={{ padding: '15px' }}>
+            <p style={{ fontWeight: '700', fontSize: '16px', color: '#8B5FBF', marginBottom: '8px' }}>
+              🚨 Kenya Red Cross Mental Health
+            </p>
+            <p className="helpline-number" style={{ fontSize: '20px', fontWeight: '700', color: '#2D2D2D' }}>
+              1190 / 1199
+            </p>
+            <p className="helpline-note">24/7 Crisis Support</p>
+          </div>
+
+          <div className="immediate-help-card" style={{ padding: '15px' }}>
+            <p style={{ fontWeight: '700', fontSize: '16px', color: '#8B5FBF', marginBottom: '8px' }}>
+              💚 Befrienders Kenya
+            </p>
+            <p className="helpline-number" style={{ fontSize: '20px', fontWeight: '700', color: '#2D2D2D' }}>
+              0722 178 177
+            </p>
+            <p className="helpline-note">7 AM - 7 PM Daily</p>
+          </div>
+
+          <div className="immediate-help-card" style={{ padding: '15px' }}>
+            <p style={{ fontWeight: '700', fontSize: '16px', color: '#8B5FBF', marginBottom: '8px' }}>
+              🏥 Chiromo Hospital Group
+            </p>
+            <p className="helpline-number" style={{ fontSize: '20px', fontWeight: '700', color: '#2D2D2D' }}>
+              0800 220 000
+            </p>
+            <p className="helpline-note">24/7 Mental Health Support</p>
+          </div>
+
+          <div className="immediate-help-card" style={{ padding: '15px' }}>
+            <p style={{ fontWeight: '700', fontSize: '16px', color: '#8B5FBF', marginBottom: '8px' }}>
+              👶 Childline Kenya (Youth)
+            </p>
+            <p className="helpline-number" style={{ fontSize: '20px', fontWeight: '700', color: '#2D2D2D' }}>
+              116
+            </p>
+            <p className="helpline-note">24/7 Toll-Free for Children</p>
+          </div>
+
+          <div className="immediate-help-card" style={{ padding: '15px' }}>
+            <p style={{ fontWeight: '700', fontSize: '16px', color: '#8B5FBF', marginBottom: '8px' }}>
+              🌈 Bold Network Africa (LGBTQIA+)
+            </p>
+            <p className="helpline-number" style={{ fontSize: '18px', fontWeight: '700', color: '#2D2D2D' }}>
+              +254 705 227 227
+            </p>
+            <p className="helpline-note">8 AM - 8 PM Daily</p>
+          </div>
+
+          <div className="immediate-help-card" style={{ padding: '15px' }}>
+            <p style={{ fontWeight: '700', fontSize: '16px', color: '#8B5FBF', marginBottom: '8px' }}>
+              🚔 Kenya Police Emergency
+            </p>
+            <p className="helpline-number" style={{ fontSize: '20px', fontWeight: '700', color: '#2D2D2D' }}>
+              911 / 999 / 112
+            </p>
+            <p className="helpline-note">All Emergencies</p>
+          </div>
+        </div>
+
+        <div className="content-card" style={{ marginTop: '15px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#2D2D2D', marginBottom: '10px' }}>
+            📞 More Support Services
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px', color: '#2D2D2D' }}>
+            <p><strong>Emergency Medicine Kenya:</strong> 0800 723 253</p>
+            <p><strong>Niskize:</strong> 0900 620 800</p>
+            <p><strong>Nacada (Substance Abuse):</strong> 1192 (24/7)</p>
+            <p><strong>Gender Violence Recovery:</strong> 070 966 700 / 0800 720 565</p>
+            <p><strong>Support Line Kenya:</strong> 254 20 3000378</p>
+          </div>
+        </div>
+
+        <div className="content-card" style={{ marginTop: '15px', backgroundColor: '#FFF9E6', border: '2px solid #FFD700' }}>
+          <p style={{ fontSize: '14px', color: '#2D2D2D', margin: '0', lineHeight: '1.6' }}>
+            <strong>⚠️ Important:</strong> If you or someone you know is in immediate danger, please call <strong>911, 999, or 112</strong> for emergency services. These mental health hotlines provide free, confidential support 24/7. You are not alone.
+          </p>
         </div>
       </div>
 

@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS Configuration - Added explicit allowed origin to fix CORS error
-const allowedOrigin = 'https://auracare-kappa.vercel.app'; // Replace with your actual frontend URL if it changes
+const allowedOrigin = 'https://auracare-kappa.vercel.app';
 const corsOptions = {
     origin: allowedOrigin,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -31,6 +31,9 @@ mongoose.connect(process.env.MONGO_URI)
 const SupportContactSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
+    emailVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    verificationSentAt: { type: Date }
 });
 
 const UserSchema = new mongoose.Schema({
@@ -39,6 +42,15 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     phoneNumber: String,
     supportCircle: [SupportContactSchema],
+    notificationSettings: {
+        emailNotifications: { type: Boolean, default: true },
+        moodReminders: { type: Boolean, default: true },
+        supportAlerts: { type: Boolean, default: true }
+    },
+    privacySettings: {
+        dataSharing: { type: Boolean, default: false },
+        profileVisibility: { type: String, default: 'private', enum: ['private', 'contacts', 'public'] }
+    }
 }, { timestamps: true });
 
 const MoodLogSchema = new mongoose.Schema({
@@ -366,6 +378,42 @@ app.post('/api/support-circle', authenticateUser, async (req, res) => {
     }
 });
 
+app.put('/api/support-circle/:contactId', authenticateUser, async (req, res) => {
+    try {
+        const { contactId } = req.params;
+        const { name, email } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).json({ message: 'Name and email are required.' });
+        }
+
+        // Find user and update the specific contact
+        const user = await User.findById(req.userId);
+        if (!user) { return res.status(404).json({ message: 'User not found.' }); }
+
+        const contactIndex = user.supportCircle.findIndex(
+            contact => contact._id.toString() === contactId
+        );
+
+        if (contactIndex === -1) {
+            return res.status(404).json({ message: 'Contact not found.' });
+        }
+
+        user.supportCircle[contactIndex].name = name;
+        user.supportCircle[contactIndex].email = email;
+
+        await user.save();
+
+        res.status(200).json({ 
+            message: 'Contact updated successfully', 
+            supportCircle: user.supportCircle 
+        });
+    } catch (error) {
+        if (error.name === 'CastError') { return res.status(400).json({ message: 'Invalid contact ID format.' }); }
+        res.status(500).json({ message: 'Failed to update contact: Internal server error', error: error.message });
+    }
+});
+
 app.delete('/api/support-circle/:contactId', authenticateUser, async (req, res) => {
     try {
         const { contactId } = req.params;
@@ -389,6 +437,97 @@ app.delete('/api/support-circle/:contactId', authenticateUser, async (req, res) 
 });
 
 
+// Notification Settings Endpoints
+app.get('/api/notification-settings', authenticateUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('notificationSettings');
+        if (!user) { return res.status(404).json({ message: 'User not found.' }); }
+        
+        res.status(200).json({ 
+            notificationSettings: user.notificationSettings || {
+                emailNotifications: true,
+                moodReminders: true,
+                supportAlerts: true
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to retrieve notification settings.', error: error.message });
+    }
+});
+
+app.put('/api/notification-settings', authenticateUser, async (req, res) => {
+    try {
+        const { emailNotifications, moodReminders, supportAlerts } = req.body;
+        
+        const updateFields = {};
+        if (emailNotifications !== undefined) updateFields['notificationSettings.emailNotifications'] = emailNotifications;
+        if (moodReminders !== undefined) updateFields['notificationSettings.moodReminders'] = moodReminders;
+        if (supportAlerts !== undefined) updateFields['notificationSettings.supportAlerts'] = supportAlerts;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            { $set: updateFields },
+            { new: true, runValidators: true }
+        ).select('notificationSettings');
+
+        if (!updatedUser) { return res.status(404).json({ message: 'User not found.' }); }
+
+        res.status(200).json({ 
+            message: 'Notification settings updated successfully.',
+            notificationSettings: updatedUser.notificationSettings
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to update notification settings.', error: error.message });
+    }
+});
+
+// Privacy Settings Endpoints
+app.get('/api/privacy-settings', authenticateUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('privacySettings');
+        if (!user) { return res.status(404).json({ message: 'User not found.' }); }
+        
+        res.status(200).json({ 
+            privacySettings: user.privacySettings || {
+                dataSharing: false,
+                profileVisibility: 'private'
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to retrieve privacy settings.', error: error.message });
+    }
+});
+
+app.put('/api/privacy-settings', authenticateUser, async (req, res) => {
+    try {
+        const { dataSharing, profileVisibility } = req.body;
+        
+        const updateFields = {};
+        if (dataSharing !== undefined) updateFields['privacySettings.dataSharing'] = dataSharing;
+        if (profileVisibility !== undefined) {
+            if (!['private', 'contacts', 'public'].includes(profileVisibility)) {
+                return res.status(400).json({ message: 'Invalid profile visibility value.' });
+            }
+            updateFields['privacySettings.profileVisibility'] = profileVisibility;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            { $set: updateFields },
+            { new: true, runValidators: true }
+        ).select('privacySettings');
+
+        if (!updatedUser) { return res.status(404).json({ message: 'User not found.' }); }
+
+        res.status(200).json({ 
+            message: 'Privacy settings updated successfully.',
+            privacySettings: updatedUser.privacySettings
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to update privacy settings.', error: error.message });
+    }
+});
+
 app.post('/api/need-support', authenticateUser, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select('fullName supportCircle');
@@ -400,8 +539,17 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
         
         let sentCount = 0;
         let failedCount = 0;
+        let unverifiedCount = 0;
+        const unverifiedContacts = [];
         
         for (const contact of user.supportCircle) {
+            // Check if email is verified (for now, we'll send to all but track unverified)
+            // In production, you might want to skip unverified emails
+            if (!contact.emailVerified) {
+                unverifiedCount++;
+                unverifiedContacts.push(contact.name);
+            }
+            
             const emailSent = await sendSupportEmail(contact.email, contact.name, user.fullName);
             
             if (emailSent) {
@@ -411,13 +559,26 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
             }
         }
         
-        const message = failedCount > 0 
-            ? `Emergency signal sent. ${sentCount} contact(s) notified via email. ${failedCount} email(s) failed to send.`
-            : `Emergency signal sent. ${sentCount} contact(s) notified via email.`;
+        let message = '';
+        if (failedCount > 0) {
+            message = `Emergency signal sent. ${sentCount} contact(s) notified via email. ${failedCount} email(s) failed to send.`;
+        } else {
+            message = `Emergency signal sent. ${sentCount} contact(s) notified via email.`;
+        }
+        
+        if (unverifiedCount > 0) {
+            message += ` Note: ${unverifiedCount} contact(s) have unverified email addresses.`;
+        }
 
         res.status(200).json({ 
             message: message,
-            notifiedContacts: user.supportCircle.map(c => ({ name: c.name, email: c.email, _id: c._id })) // Changed phone to email
+            notifiedContacts: user.supportCircle.map(c => ({ 
+                name: c.name, 
+                email: c.email, 
+                _id: c._id,
+                emailVerified: c.emailVerified || false
+            })),
+            unverifiedContacts: unverifiedContacts
         });
 
     } catch (error) {

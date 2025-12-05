@@ -120,7 +120,12 @@ const Dashboard = () => {
           const data = await response.json();
 
           if (response.ok) {
-              navigate('/help-on-way', { state: { notifiedContacts: data.notifiedContacts } });
+              navigate('/help-on-way', { 
+                  state: { 
+                      notifiedContacts: data.notifiedContacts,
+                      unverifiedContacts: data.unverifiedContacts || []
+                  } 
+              });
           } else if (response.status === 400 && data.message.includes('No contacts')) {
               alert('Please add contacts to your support circle before activating the signal.');
               navigate('/support-circle');

@@ -12,6 +12,8 @@ const SupportCircle = () => {
   const [supportCircle, setSupportCircle] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('User');
+  const [editingContactId, setEditingContactId] = useState(null);
+  const [editFormData, setEditFormData] = useState({ name: '', email: '' });
 
   const userId = localStorage.getItem('currentUserId'); 
   const token = localStorage.getItem('authToken');
@@ -67,6 +69,13 @@ const SupportCircle = () => {
   const handleAddContact = async () => {
     if (!contactName || !contactEmail) {
       alert('Please enter both name and email address.');
+      return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactEmail)) {
+      alert('Please enter a valid email address.');
       return;
     }
     
@@ -139,6 +148,67 @@ const SupportCircle = () => {
     }
   };
 
+  const handleEditClick = (contact) => {
+    setEditingContactId(contact._id);
+    setEditFormData({ name: contact.name, email: contact.email });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingContactId(null);
+    setEditFormData({ name: '', email: '' });
+  };
+
+  const handleEditChange = (e) => {
+    setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateContact = async (contactId) => {
+    if (!editFormData.name || !editFormData.email) {
+      alert('Please enter both name and email address.');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editFormData.email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    if (!token) {
+        alert('Session expired. Please log in.');
+        navigate('/login');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/support-circle/${contactId}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ name: editFormData.name, email: editFormData.email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Contact updated successfully!');
+            setSupportCircle(data.supportCircle);
+            setEditingContactId(null);
+            setEditFormData({ name: '', email: '' });
+        } else if (response.status === 401 || response.status === 400) {
+            alert('Session expired. Please log in again.');
+            navigate('/login');
+        } else {
+            alert(`Failed to update contact: ${data.message || 'Server Error'}`);
+        }
+    } catch (error) {
+        alert('Could not connect to the server.');
+    }
+  };
+
   return (
     <div className="support-circle-container">
       <Link to="/dashboard" className="back-button-link">« Back to Dashboard</Link>
@@ -156,15 +226,126 @@ const SupportCircle = () => {
             <div className="actual-contacts-list">
                 {supportCircle.map((contact) => (
                     <div key={contact._id} className="actual-contact-item">
-                        <span className="contact-details">👥 {contact.name} - {contact.email}</span> 
-                        <button 
-                            className="delete-contact-button" 
-                            onClick={() => handleDeleteContact(contact._id)}
-                            aria-label={`Remove ${contact.name}`}
-                            title="Remove contact"
-                        >
-                            ✕
-                        </button>
+                        {editingContactId === contact._id ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+                                <input 
+                                    type="text" 
+                                    name="name"
+                                    value={editFormData.name}
+                                    onChange={handleEditChange}
+                                    placeholder="Contact Name"
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #E0E0E0',
+                                        fontSize: '14px'
+                                    }}
+                                />
+                                <input 
+                                    type="email" 
+                                    name="email"
+                                    value={editFormData.email}
+                                    onChange={handleEditChange}
+                                    placeholder="Contact Email"
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #E0E0E0',
+                                        fontSize: '14px'
+                                    }}
+                                />
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button 
+                                        onClick={() => handleUpdateContact(contact._id)}
+                                        style={{
+                                            padding: '8px 16px',
+                                            backgroundColor: '#8B5FBF',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            fontSize: '14px',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        Save
+                                    </button>
+                                    <button 
+                                        onClick={handleCancelEdit}
+                                        style={{
+                                            padding: '8px 16px',
+                                            backgroundColor: '#E0E0E0',
+                                            color: '#2D2D2D',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            fontSize: '14px',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1 }}>
+                                    <span className="contact-details">👥 {contact.name} - {contact.email}</span>
+                                    {!contact.emailVerified && (
+                                        <span style={{ 
+                                            fontSize: '12px', 
+                                            color: '#FF6B6B', 
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            ⚠️ Email not verified - Support signals may not be delivered
+                                        </span>
+                                    )}
+                                    {contact.emailVerified && (
+                                        <span style={{ 
+                                            fontSize: '12px', 
+                                            color: '#4CAF50', 
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            ✓ Email verified
+                                        </span>
+                                    )}
+                                </div>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button 
+                                        className="edit-contact-button" 
+                                        onClick={() => handleEditClick(contact)}
+                                        aria-label={`Edit ${contact.name}`}
+                                        title="Edit contact"
+                                        style={{
+                                            padding: '6px 12px',
+                                            backgroundColor: '#F0F0F0',
+                                            color: '#2D2D2D',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            cursor: 'pointer',
+                                            fontSize: '14px',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        ✏️ Edit
+                                    </button>
+                                    <button 
+                                        className="delete-contact-button" 
+                                        onClick={() => handleDeleteContact(contact._id)}
+                                        aria-label={`Remove ${contact.name}`}
+                                        title="Remove contact"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 ))}
             </div>
