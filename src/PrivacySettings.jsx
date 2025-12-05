@@ -86,12 +86,67 @@ const PrivacySettings = () => {
     }
   };
 
-  const handleDeleteAccount = () => {
-    alert('Account deletion functionality will be implemented soon. Please contact support at support@auracare.com for assistance with account deletion.');
+  const handleChangePassword = async () => {
+      // NOTE: In a production app, you would use a dedicated modal/form. 
+      // Using prompt() here for quick implementation.
+      const oldPassword = prompt("Please enter your current password:");
+      if (!oldPassword) return; 
+
+      const newPassword = prompt("Please enter your new password:");
+      if (!newPassword) return;
+      
+      if (newPassword.length < 6) { 
+          alert("New password must be at least 6 characters long.");
+          return;
+      }
+
+      try {
+          const response = await fetch(`${API_BASE_URL}/api/profile/password`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ oldPassword, newPassword })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+              alert(data.message); // Success message includes "Please log in again."
+              localStorage.removeItem('authToken'); 
+              navigate('/login'); // Redirect to login
+          } else {
+              alert(`Failed to change password: ${data.message || 'Server error'}`);
+          }
+      } catch (error) {
+          alert('Could not connect to the server.');
+      }
   };
 
-  const handleChangePassword = () => {
-    alert('Password change functionality will be implemented soon. For now, please contact support at support@auracare.com if you need to reset your password.');
+  const handleDeleteAccount = async () => {
+      const confirmation = window.confirm('WARNING: Are you absolutely sure you want to delete your AuraCare account? This action is permanent and will delete ALL your mood history, journals, and support contacts.');
+      if (!confirmation) return;
+      
+      try {
+          const response = await fetch(`${API_BASE_URL}/api/profile`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+              alert(data.message);
+              localStorage.removeItem('authToken'); 
+              localStorage.removeItem('currentUserId'); 
+              navigate('/'); // Go back to the Onboarding page
+          } else {
+              alert(`Failed to delete account: ${data.message || 'Server error'}`);
+          }
+      } catch (error) {
+          alert('Could not connect to the server.');
+      }
   };
 
   if (loading) {

@@ -691,6 +691,59 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
     }
 });
 
+// --- New API Endpoint: Delete Account ---
+app.delete('/api/profile', authenticateUser, async (req, res) => {
+    try {
+        // 1. Delete all associated mood logs
+        await MoodLog.deleteMany({ userId: req.userId });
+        
+        // 2. Delete the user document
+        const deletedUser = await User.findByIdAndDelete(req.userId);
+
+        if (!deletedUser) { return res.status(404).json({ message: 'User not found.' }); }
+
+        // Success: Account deleted
+        res.status(200).json({ message: 'Account and all associated data deleted successfully.' });
+
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        res.status(500).json({ message: 'Failed to delete account: Internal server error' });
+    }
+});
+
+// --- New API Endpoint: Change Password ---
+app.put('/api/profile/password', authenticateUser, async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ message: 'Old and new passwords are required.' });
+        }
+        if (newPassword.length < 6) { // Basic validation
+             return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+        }
+
+        // 1. Retrieve the user to compare old password
+        // The .select('+password') is necessary if the schema excludes it by default
+        const user = await User.findById(req.userId).select('+password');
+        if (!user) { return res.status(404).json({ message: 'User not found.' }); }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) { return res.status(401).json({ message: 'Invalid current password.' }); }
+
+        // 2. Hash and save the new password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.status(200).json({ message: 'Password updated successfully. Please log in again.' });
+
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ message: 'Failed to change password: Internal server error' });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
