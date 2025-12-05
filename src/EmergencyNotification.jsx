@@ -4,7 +4,7 @@ import './PageLayout.css';
 
 const EmergencyNotification = () => {
   const location = useLocation();
-  const notifiedContacts = location.state?.notifiedContacts || [];
+  const contactReports = location.state?.contactReports || []; // Use contactReports
   const unverifiedContacts = location.state?.unverifiedContacts || [];
   
   const getIcon = (name) => {
@@ -21,7 +21,7 @@ const EmergencyNotification = () => {
       </h1>
 
       <p className="notification-subtitle">
-        We've notified your support circle ({notifiedContacts.length} contact{notifiedContacts.length !== 1 ? 's' : ''}).
+        We've attempted to notify your support circle ({contactReports.length} contact{contactReports.length !== 1 ? 's' : ''}).
       </p>
 
       {hasUnverifiedEmails && (
@@ -59,32 +59,39 @@ const EmergencyNotification = () => {
       )}
 
       <div className="notified-card">
-        {notifiedContacts.length > 0 ? (
-            notifiedContacts.map((contact, index) => (
-              <div key={contact._id || index} className="contact-status">
-                <span className="contact-icon">{getIcon(contact.name)}</span>
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  <span className="contact-name">{contact.name} ({contact.email})</span>
-                  {!contact.emailVerified && (
-                    <span style={{ 
-                      fontSize: '11px', 
-                      color: '#FF6B6B', 
-                      fontWeight: '600',
-                      marginTop: '2px'
-                    }}>
-                      ⚠️ Email not verified
-                    </span>
-                  )}
-                </div>
-                <span className="notification-status">
-                  Notified 
-                  <span className="check-mark">✔</span>
-                </span>
-              </div>
-            ))
+        {contactReports.length > 0 ? (
+            contactReports.map((report, index) => {
+                const isSent = report.deliveryStatus === 'SENT';
+                const statusText = isSent ? 'Sent' : 'Failed';
+                const statusColor = isSent ? '#4CAF50' : '#FF6B6B';
+                const statusIcon = isSent ? '✔' : '❌';
+
+                return (
+                    <div key={report._id || index} className="contact-status">
+                        <span className="contact-icon">{getIcon(report.name)}</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                            <span className="contact-name">{report.name} ({report.email})</span>
+                            {!report.emailVerified && (
+                                <span style={{ 
+                                    fontSize: '11px', 
+                                    color: '#FFC107', 
+                                    fontWeight: '600',
+                                    marginTop: '2px'
+                                }}>
+                                    ⚠️ Email unverified (Potential future issue)
+                                </span>
+                            )}
+                        </div>
+                        <span className="notification-status" style={{ color: statusColor }}>
+                            {statusText} 
+                            <span style={{ color: statusColor, marginLeft: '5px' }}>{statusIcon}</span>
+                        </span>
+                    </div>
+                );
+            })
         ) : (
             <div className="contact-status">
-                <span className="contact-name">No contacts were notified.</span>
+                <span className="contact-name">No contacts were found in your support circle.</span>
                 <span className="notification-status" style={{ color: '#FF6B8B' }}>
                   Check Circle
                 </span>

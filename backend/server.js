@@ -11,7 +11,7 @@ const { sendSupportEmail } = require('./emailService'); // Import email service
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS Configuration - Added explicit allowed origin to fix CORS error
+// CORS Configuration
 const allowedOrigin = 'https://auracare-kappa.vercel.app';
 const corsOptions = {
     origin: allowedOrigin,

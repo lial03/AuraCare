@@ -122,7 +122,7 @@ const Dashboard = () => {
           if (response.ok) {
               navigate('/help-on-way', { 
                   state: { 
-                      notifiedContacts: data.notifiedContacts,
+                      contactReports: data.contactReports,
                       unverifiedContacts: data.unverifiedContacts || []
                   } 
               });

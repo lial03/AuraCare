@@ -4,7 +4,7 @@ require('dotenv').config();
 // Create a transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
     host: 'smtp.mailgun.org', 
-    port: 2525, // Changed to 2525 as a last resort alternative port
+    port: 2525, // Changed to 2525 as a last resort
     secure: false, // Use STARTTLS
     auth: {
         user: process.env.MAILGUN_SMTP_LOGIN, 
