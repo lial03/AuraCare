@@ -10,15 +10,13 @@ The core functionality of AuraCare revolves around three pillars:
 2.  **Data-Driven Insights:** The application visualizes mood trends and generates context-aware insights to promote self-awareness.
 3.  **Automated Peer Support:** Users can register a trusted support circle and, in times of distress, automatically notify them via email with a single click.
 
-This project was developed as part of the SWE3090A course, demonstrating proficiency in modern web development technologies and adherence to the principles outlined in the project proposal.
-
 ## 🚀 Key Features
 
-- **Secure Authentication:** User registration and login using email or phone number, secured with JWT and `bcrypt`.
-- **Mood Logging:** Simple interface for daily mood logging with optional notes.
-- **Personalized Dashboard:** Visualization of mood history and trends using **Recharts**.
-- **Dynamic Insights:** Algorithmic analysis of mood patterns to provide actionable, context-aware recommendations (e.g., identifying downward trends or potential triggers).
-- **Support Circle Management:** Ability to add and remove trusted contacts.
+- **Secure Authentication & Account Management:** User registration/login, secure password management (`bcrypt`), and the ability to **Change Password** and **Permanently Delete** their account and all associated data.
+- **Mood & Journal Logging:** Simple interface for daily mood logging with optional notes.
+- **AI Journal Analysis:** **New feature** that provides a summary, tone, and theme for reflective journal entries using AI.
+- **Personalized Dashboard & Dynamic Insights:** Visualization of mood history and trends (**Recharts**) and **algorithmic/AI analysis** to provide actionable, context-aware recommendations (e.g., identifying downward trends or potential triggers).
+- **Support Circle & Communication:** Ability to manage trusted contacts, display their **email verification status**, and use **AI-generated proactive check-in scripts** for low-pressure communication.
 - **Emergency Notification:** One-click activation to send an urgent email notification to the entire support circle.
 - **Journaling:** Dedicated space for private reflection and historical review of entries.
 
@@ -26,14 +24,15 @@ This project was developed as part of the SWE3090A course, demonstrating profici
 
 AuraCare is built on a modern MERN-stack architecture, ensuring a scalable, robust, and responsive application.
 
-| Component          | Technology                      | Purpose                                                                              |
-| :----------------- | :------------------------------ | :----------------------------------------------------------------------------------- |
-| **Frontend**       | **React.js** (with Vite)        | Building the user interface and handling client-side logic.                          |
-| **Backend**        | **Node.js** with **Express.js** | Handling API endpoints, business logic, and server-side operations.                  |
-| **Database**       | **MongoDB** (via Mongoose)      | Flexible, scalable storage for user profiles, mood logs, and support contacts.       |
-| **Visualization**  | **Recharts**                    | Rendering interactive and informative mood trend charts.                             |
-| **Authentication** | **JWT** & **Bcrypt**            | Secure user session management and password hashing.                                 |
-| **Notification**   | **Nodemailer** & **Mailgun**    | Reliable, cost-effective service for sending urgent support notifications via email. |
+| Component          | Technology                              | Purpose                                                                              |
+| :----------------- | :-------------------------------------- | :----------------------------------------------------------------------------------- |
+| **AI/LLM**         | **Google Gemini API** (`@google/genai`) | Generating journal analyses, dynamic insights, and proactive communication scripts.  |
+| **Frontend**       | **React.js** (with Vite)                | Building the user interface and handling client-side logic.                          |
+| **Backend**        | **Node.js** with **Express.js**         | Handling API endpoints, business logic, and server-side operations.                  |
+| **Database**       | **MongoDB** (via Mongoose)              | Flexible, scalable storage for user profiles, mood logs, and support contacts.       |
+| **Visualization**  | **Recharts**                            | Rendering interactive and informative mood trend charts.                             |
+| **Authentication** | **JWT** & **Bcrypt**                    | Secure user session management and password hashing.                                 |
+| **Notification**   | **Nodemailer** & **Mailgun**            | Reliable, cost-effective service for sending urgent support notifications via email. |
 
 ## ⚙️ Installation and Setup
 
@@ -45,7 +44,7 @@ AuraCare is built on a modern MERN-stack architecture, ensuring a scalable, robu
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/lial03/AuraCare.git
+git clone [https://github.com/lial03/AuraCare.git](https://github.com/lial03/AuraCare.git)
 cd AuraCare
 ```
 
@@ -65,6 +64,7 @@ JWT_SECRET=a_strong_secret_key
 MAILGUN_SMTP_LOGIN=your_mailgun_smtp_login
 MAILGUN_SMTP_PASSWORD=your_mailgun_smtp_password
 MAILGUN_SENDER_EMAIL=your_sender_email@example.com
+AI_API_KEY=your_gemini_api_key
 ```
 
 Run the backend server:
