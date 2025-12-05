@@ -8,6 +8,10 @@ require('dotenv').config();
 
 const { sendSupportEmail } = require('./emailService'); // Import email service
 
+// --- NEW: AI SDK Setup ---
+const { GoogleGenAI } = require('@google/genai');
+const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY }); 
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -18,7 +22,6 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl)
         if (!origin) return callback(null, true);
         if (allowedOrigins.indexOf(origin) === -1) {
             const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
@@ -73,130 +76,81 @@ const MoodLogSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const MoodLog = mongoose.model('MoodLog', MoodLogSchema);
 
-const moodToValue = (mood) => {
-    switch (mood) {
-        case 'Terrible': return 1;
-        case 'Down': return 2;
-        case 'Okay': return 3;
-        case 'Good': return 4;
-        case 'Amazing': return 5;
-        case 'Mixed': return 3;
-        case 'Journal Entry': return 3;
-        default: return 3;
-    }
+// --- NEW: AI Insight Generation Logic ---
+const formatHistoryForLLM = (moodHistory) => {
+    // We send the last 7 mood entries with notes
+    return moodHistory.slice(0, 7).map(entry => 
+        `Mood: ${entry.mood}, Notes: "${entry.notes || 'No notes provided.'}", Date: ${new Date(entry.createdAt).toDateString()}`
+    ).join('\n');
 };
 
-const generateDynamicInsights = (moodHistory) => {
+/**
+ * Uses the Gemini API to generate personalized, dynamic insights.
+ */
+const generateDynamicInsightsAI = async (moodHistory, userName) => {
+    // Require at least 3 data points for meaningful analysis
     if (moodHistory.length < 3) {
-        return null;
-    }
-    
-    // Convert all moods to a numerical value array
-    const numericalHistory = moodHistory.map(log => moodToValue(log.mood));
-    
-    let finalInsight = {};
-    let isTrendIdentified = false;
-
-    // --- 1. Recent Trend Analysis (Past 3 days vs. Previous Period) ---
-    const recentEntries = numericalHistory.slice(0, 3);
-    const earlierEntries = numericalHistory.slice(3, 10);
-    
-    const avgRecent = recentEntries.reduce((sum, val) => sum + val, 0) / recentEntries.length;
-
-    if (earlierEntries.length >= 3) {
-        const avgEarlier = earlierEntries.reduce((sum, val) => sum + val, 0) / earlierEntries.length;
-        const trendDifference = avgRecent - avgEarlier;
-
-        if (trendDifference < -0.5) {
-            // Significant Downward Trend (High Priority Alert)
-            finalInsight = { 
-                insightText: "Alert: Your mood is trending DOWN. 😔", 
-                patternText: "We recommend taking a break now. Try the breathing exercise!",
-            };
-            isTrendIdentified = true;
-        } else if (trendDifference > 0.5) {
-            // Significant Upward Trend
-            finalInsight = { 
-                insightText: "Great job! Your mood is trending UP! 🎉", 
-                patternText: "What are you doing differently? Keep it up and log those details.",
-            };
-            isTrendIdentified = true;
-        }
+        return { hasData: false };
     }
 
-    // --- 2. Low Mood Trigger Spotting (If no critical trend, check for triggers) ---
-    if (!isTrendIdentified) {
-        const lowestMoodLogs = moodHistory
-            .filter(log => moodToValue(log.mood) <= 2 && log.notes)
-            .sort((a, b) => moodToValue(a.mood) - moodToValue(b.mood));
-
-        if (lowestMoodLogs.length > 0) {
-            const lowestNote = lowestMoodLogs[0].notes ? lowestMoodLogs[0].notes.toLowerCase() : '';
-            let trigger = null;
-
-            if (lowestNote.includes('work') || lowestNote.includes('school') || lowestNote.includes('stress')) {
-                trigger = "Stress from responsibilities might be the cause.";
-            } else if (lowestNote.includes('social') || lowestNote.includes('friend') || lowestNote.includes('partner')) {
-                trigger = "Recent social stress or relationship issues were noted.";
-            } else if (lowestNote.includes('tired') || lowestNote.includes('sleep')) {
-                trigger = "Fatigue or poor sleep seems to be a recurring factor.";
-            }
-
-            if (trigger) { 
-                finalInsight = { 
-                    insightText: "Potential Trigger Spotted:", 
-                    patternText: trigger + " Try journaling about it.",
-                };
-            }
-        }
-    }
+    const historyPrompt = formatHistoryForLLM(moodHistory);
     
-    // --- 3. Weekday/Weekend Structural Analysis (Fallback) ---
-    if (Object.keys(finalInsight).length === 0) {
-        let totalWeekdayMood = 0;
-        let totalWeekendMood = 0;
-        let weekdayCount = 0;
-        let weekendCount = 0;
+    // Define the desired JSON structure (enforced by the API)
+    const jsonSchema = {
+        type: "object",
+        properties: {
+            insightText: { type: "string", description: "A concise 1-2 sentence summary of the user's current mood trend or status." },
+            patternText: { type: "string", description: "A personalized, actionable, and encouraging recommendation based on the history." }
+        },
+        required: ["insightText", "patternText"]
+    };
 
-        moodHistory.forEach(log => {
-            const value = moodToValue(log.mood);
-            const dayOfWeek = new Date(log.createdAt).getDay(); 
-            
-            if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday (0) or Saturday (6)
-                totalWeekendMood += value;
-                weekendCount++;
-            } else {
-                totalWeekdayMood += value;
-                weekdayCount++;
+    const prompt = `
+        You are an experienced and empathetic mental health support coach named AuraCare.
+        Analyze the mood history provided below for the user, ${userName}.
+
+        History (Most Recent First):
+        ---
+        ${historyPrompt}
+        ---
+
+        1. Identify the most significant recent trend (e.g., downward, upward, stable) or a recurring potential trigger found in the notes.
+        2. Generate a concise "Mood Status" summary (insightText).
+        3. Generate a personalized, actionable recommendation (patternText).
+        
+        The final response MUST be a valid JSON object matching the requested schema.
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: jsonSchema,
             }
         });
-
-        const avgWeekday = weekdayCount > 0 ? totalWeekdayMood / weekdayCount : 0;
-        const avgWeekend = weekendCount > 0 ? totalWeekendMood / weekendCount : 0;
         
-        if (Math.abs(avgWeekday - avgWeekend) > 0.5) { // Significant difference
-            if (avgWeekday > avgWeekend) {
-                finalInsight = { 
-                    insightText: "You thrive on structure! Weekday moods are higher.", 
-                    patternText: "Try to plan a social activity or hobby on the weekend.",
-                };
-            } else {
-                finalInsight = { 
-                    insightText: "You love relaxation! Weekend moods are highest.", 
-                    patternText: "Look for quick 5-minute ways to de-stress during the workweek.",
-                };
-            }
-        } else {
-            // Default stable message
-            finalInsight = { 
-                insightText: "Your mood is stable and consistent!", 
-                patternText: "Keep logging notes to find micro-patterns that lead to good days.",
-            };
-        }
+        // The API returns the JSON as a string in response.text
+        const insights = JSON.parse(response.text);
+
+        return { 
+            hasData: true, 
+            insightText: insights.insightText, 
+            patternText: insights.patternText 
+        };
+
+    } catch (error) {
+        // Log the full error to your server console but send a gentle message to the user
+        console.error("AI Insight Generation Failed:", error.message); 
+        return { 
+            hasData: true, 
+            insightText: "An AI check-in failed, but your data is safe. 🥺", 
+            patternText: "Keep logging your moods and notes—you're doing great just by checking in." 
+        };
     }
-    
-    return { hasData: true, insightText: finalInsight.insightText, patternText: finalInsight.patternText };
 };
+// --- END NEW: AI Insight Generation Logic ---
 
 
 const authenticateUser = (req, res, next) => {
@@ -325,10 +279,15 @@ app.get('/api/insights', authenticateUser, async (req, res) => {
             userId: req.userId,
             mood: { $ne: 'Journal Entry' }
         }).sort({ createdAt: -1 });
-        
-        const insights = generateDynamicInsights(moodHistory);
 
-        if (!insights) { return res.status(200).json({ hasData: false }); }
+        // Fetch user's name for personalization
+        const user = await User.findById(req.userId).select('fullName');
+        const userName = user ? user.fullName : 'User';
+        
+        // Call the new AI function
+        const insights = await generateDynamicInsightsAI(moodHistory, userName);
+
+        if (!insights.hasData) { return res.status(200).json({ hasData: false }); }
         res.status(200).json({ hasData: true, ...insights });
 
     } catch (error) {
