@@ -4,7 +4,7 @@ import './PageLayout.css';
 
 const EmergencyNotification = () => {
   const location = useLocation();
-  const contactReports = location.state?.contactReports || []; // Use contactReports
+  const contactReports = location.state?.contactReports || [];
   const unverifiedContacts = location.state?.unverifiedContacts || [];
   
   const getIcon = (name) => {

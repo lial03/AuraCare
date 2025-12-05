@@ -34,7 +34,7 @@
   opacity: 0.8;
 }
 
-/* Page title (consistent across all pages) */
+/* Page title */
 .page-title {
   font-size: 26px;
   font-weight: 700;
@@ -62,7 +62,7 @@
   letter-spacing: 0;
 }
 
-/* User avatar (consistent styling) */
+/* User avatar */
 .user-avatar-small {
   width: 40px;
   height: 40px;

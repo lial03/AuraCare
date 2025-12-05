@@ -118,9 +118,9 @@ const MoodHistoryPage = () => {
                 <div className="mood-log-list" style={{ marginTop: '20px' }}>
                     {history.map((log, index) => (
                         <div 
-                            key={index} 
+                            key={index}
                             className="content-card"
-                            style={{ 
+                            style={{
                                 borderLeft: `5px solid ${getMoodColor(log.mood)}`,
                                 paddingLeft: '20px'
                             }}

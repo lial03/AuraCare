@@ -9,7 +9,7 @@
     box-sizing: border-box;
 }
 
-/* --- 1. Header  --- */
+/* --- Header  --- */
 .log-header {
     display: flex;
     justify-content: flex-start;
@@ -54,7 +54,7 @@
     right: 20px; 
 }
 
-/* --- 2. Mood Selection Section --- */
+/* --- Mood Selection Section --- */
 .mood-selection-section {
     margin: 0 0 30px 0; 
     background: white;
@@ -113,7 +113,7 @@
     text-align: center;
 }
 
-/* --- 3. Notes Section --- */
+/* --- Notes Section --- */
 .notes-section {
     margin: 0 0 40px 0; 
 }
@@ -133,7 +133,7 @@
     min-height: 150px;
 }
 
-/* --- 4. Action Button --- */
+/* --- Action Button --- */
 .action-button-group {
     text-align: center;
     margin-top: auto; 

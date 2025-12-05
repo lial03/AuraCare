@@ -9,7 +9,7 @@
   text-align: center;
 }
 
-/* --- 1. Logo Section --- */
+/* --- Logo Section --- */
 .logo-section {
   margin-bottom: 50px; 
 }
@@ -47,7 +47,7 @@
   margin: 0;
 }
 
-/* --- 2. Illustration Line --- */
+/* --- Illustration Line --- */
 .illustration-line {
   width: 70%; 
   display: flex;
@@ -76,7 +76,7 @@
   color: #8B5FBF; 
 }
 
-/* --- 3. Main Text and CTA --- */
+/* --- Main Text and CTA --- */
 .content-section {
   max-width: 300px;
 }

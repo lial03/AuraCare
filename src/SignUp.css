@@ -9,7 +9,7 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* --- 1. Outside Logo --- */
+/* --- Outside Logo --- */
 .app-logo {
     text-align: center;
     margin-bottom: 20px;
@@ -43,7 +43,7 @@
     color: white;
 }
 
-/* --- 2. Main Authentication Card --- */
+/* --- Main Authentication Card --- */
 .auth-card {
   background: white;
   border-radius: 20px;
@@ -159,7 +159,7 @@
   margin-top: 20px; 
 }
 
-/* --- 3. Bottom Log In Link --- */
+/* --- Bottom Log In Link --- */
 .login-link-outside {
   text-align: center;
   font-family: 'Inter', sans-serif;

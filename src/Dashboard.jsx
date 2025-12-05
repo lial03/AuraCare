@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import './Dashboard.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'; 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const moodToValue = (mood) => {
     switch (mood) {
@@ -232,13 +232,13 @@ const Dashboard = () => {
             </p>
           </div>
           
-          {/* NEW: Dynamic Action Button */}
+          {/* Dynamic Action Button */}
           {insights.actionLink && (
             <Link to={insights.actionLink} className="support-button-link"> 
                 <button 
                     className="support-button" 
                     style={{ 
-                        backgroundColor: '#8B5FBF', // Use the main theme color for this action
+                        backgroundColor: '#8B5FBF',
                         boxShadow: '0 6px 18px rgba(139, 95, 191, 0.5)',
                         marginTop: '15px'
                     }}
@@ -247,7 +247,6 @@ const Dashboard = () => {
                 </button>
             </Link>
           )}
-          {/* END NEW: Dynamic Action Button */}
         </div>
       )}
       

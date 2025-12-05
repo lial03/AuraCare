@@ -84,7 +84,7 @@ const Journaling = () => {
         
         if (analysisResponse.ok) {
             setAnalysisResult(analysisData);
-            // Don't navigate yet, let the user see the analysis!
+            // Don't navigate yet, let the user see the analysis
         } else {
             alert(`Journal entry saved, but AI analysis failed: ${analysisData.message || 'Server error'}`);
         }
@@ -128,7 +128,7 @@ const Journaling = () => {
             
             {/* --- Analysis Output --- */}
             {isAnalyzing && (
-                 <div className="content-card" style={{ textAlign: 'center', backgroundColor: '#E8F5E9', borderLeft: '5px solid #2E7D32' }}>
+                <div className="content-card" style={{ textAlign: 'center', backgroundColor: '#E8F5E9', borderLeft: '5px solid #2E7D32' }}>
                     <h3 className="section-heading" style={{ marginTop: '0', marginBottom: '5px', color: '#2E7D32' }}>Analyzing Your Entry...</h3>
                     <p style={{ color: '#2E7D32' }}>The AI is generating insights. Please wait a moment.</p>
                 </div>

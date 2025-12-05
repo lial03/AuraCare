@@ -2,21 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken'); 
-const helmet = require('helmet'); 
-require('dotenv').config(); 
+const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
+require('dotenv').config();
 
-const { sendSupportEmail } = require('./emailService'); // Import email service
-
-// --- NEW: AI SDK Setup ---
+const { sendSupportEmail } = require('./emailService');
 const { GoogleGenAI } = require('@google/genai');
-const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY }); 
-// --- END NEW: AI SDK Setup ---
+
+const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS Configuration
 const allowedOrigins = [
     'https://auracare-kappa.vercel.app'
 ];
@@ -36,7 +33,7 @@ const corsOptions = {
 };
 
 app.use(helmet()); 
-app.use(cors(corsOptions)); // <-- USING CONFIGURATION TO ALLOW FRONTEND
+app.use(cors(corsOptions)); 
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
@@ -77,34 +74,31 @@ const MoodLogSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const MoodLog = mongoose.model('MoodLog', MoodLogSchema);
 
-// --- AI Insight Generation Logic (Dashboard) ---
+
+// --- AI Logic (Shared Helper) ---
 const formatHistoryForLLM = (moodHistory) => {
-    // We send the last 7 mood entries with notes
     return moodHistory.slice(0, 7).map(entry => 
         `Mood: ${entry.mood}, Notes: "${entry.notes || 'No notes provided.'}", Date: ${new Date(entry.createdAt).toDateString()}`
     ).join('\n');
 };
 
-/**
- * Uses the Gemini API to generate personalized, dynamic insights.
- */
+// --- AI Logic (Dashboard/Resources Insight Generation) ---
 const generateDynamicInsightsAI = async (moodHistory, userName) => {
-    // Require at least 3 data points for meaningful analysis
     if (moodHistory.length < 3) {
         return { hasData: false };
     }
-
     const historyPrompt = formatHistoryForLLM(moodHistory);
     
-    // Define the desired JSON structure (enforced by the API)
+    // Schema definition for the AI's JSON output
     const jsonSchema = {
         type: "object",
         properties: {
             insightText: { type: "string", description: "A concise 1-2 sentence summary of the user's current mood trend or status." },
             patternText: { type: "string", description: "A personalized, actionable, and encouraging recommendation based on the history." },
-            actionLink: { type: "string", description: "The most relevant internal link for immediate action. Must be one of: /breathing-exercise, /resources/journaling, or /support-circle." }
+            actionLink: { type: "string", description: "The most relevant internal link for immediate action. Must be one of: /breathing-exercise, /resources/journaling, or /support-circle." },
+            resourceHighlightTag: { type: "string", description: "A tag indicating the top category of resource needed now. Must be one of: breathing, journaling, resilience, music, or support." } 
         },
-        required: ["insightText", "patternText", "actionLink"]
+        required: ["insightText", "patternText", "actionLink", "resourceHighlightTag"]
     };
 
     const prompt = `
@@ -116,10 +110,8 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
         ${historyPrompt}
         ---
 
-        1. Identify the most significant recent trend (e.g., downward, upward, stable) or a recurring potential trigger found in the notes.
-        2. Generate a concise "Mood Status" summary (insightText).
-        3. Generate a personalized, actionable recommendation (patternText).
-        4. Based on the pattern, select the single best resource link from the following choices: /breathing-exercise (for anxiety/stress), /resources/journaling (for complex emotions/reflection), or /support-circle (for isolation/low mood requiring contact). 
+        1. Identify the most significant recent trend or potential trigger.
+        2. Select the single best general resource category to highlight (resourceHighlightTag): breathing, journaling, resilience, music, or support.
         
         The final response MUST be a valid JSON object matching the requested schema.
     `;
@@ -134,35 +126,29 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
             }
         });
         
-        // The API returns the JSON as a string in response.text
         const insights = JSON.parse(response.text);
 
         return { 
             hasData: true, 
             insightText: insights.insightText, 
             patternText: insights.patternText,
-            actionLink: insights.actionLink // Pass the new link to the frontend
+            actionLink: insights.actionLink,
+            resourceHighlightTag: insights.resourceHighlightTag
         };
 
     } catch (error) {
-        // Log the full error to your server console but send a gentle message to the user
         console.error("AI Dashboard Insight Generation Failed:", error.message); 
         return { 
             hasData: true, 
             insightText: "An AI check-in failed, but your data is safe. 🥺", 
             patternText: "Keep logging your moods and notes—you're doing great just by checking in.",
-            actionLink: "/resources" // Fallback to the main resources page
+            actionLink: "/resources", 
+            resourceHighlightTag: "journaling"
         };
     }
 };
-// --- END AI Insight Generation Logic (Dashboard) ---
 
-
-// --- AI Insight Generation Logic (Journal Analysis) ---
-
-/**
- * Uses the Gemini API to analyze raw journal text for tone and theme.
- */
+// --- AI Logic (Journal Analysis) ---
 const analyzeJournalEntryAI = async (notes) => {
     
     const jsonSchema = {
@@ -212,15 +198,8 @@ const analyzeJournalEntryAI = async (notes) => {
     }
 };
 
-// --- END AI Insight Generation Logic (Journal Analysis) ---
-
-// --- NEW: AI Insight Generation Logic (Communication Script) ---
-
-/**
- * Uses the Gemini API to generate a personalized, low-stakes communication script.
- */
+// --- AI Logic (Communication Script) ---
 const generateScriptAI = async (userName, moodHistory) => {
-    // We use mood history to provide context to the AI for a better script
     const historyPrompt = moodHistory.length > 0 ? formatHistoryForLLM(moodHistory) : "No recent mood data logged.";
     
     const prompt = `
@@ -234,8 +213,6 @@ const generateScriptAI = async (userName, moodHistory) => {
         ---
 
         The script should be one or two short sentences and MUST substitute "[Contact's Name]" where appropriate.
-        
-        Example Output: "Hey [Contact's Name], just checking in. I was thinking about our conversation the other day and wanted to see how you were doing!"
 
         Return only the text message content as a simple string, with no JSON, quotes, or conversational preamble.
     `;
@@ -249,7 +226,6 @@ const generateScriptAI = async (userName, moodHistory) => {
             }
         });
         
-        // The API returns the text string directly
         return response.text;
 
     } catch (error) {
@@ -257,7 +233,6 @@ const generateScriptAI = async (userName, moodHistory) => {
         return "Hey [Contact's Name], just thinking of you today! Hope you're doing well.";
     }
 };
-// --- END NEW: AI Insight Generation Logic (Communication Script) ---
 
 const authenticateUser = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -419,11 +394,9 @@ app.get('/api/insights', authenticateUser, async (req, res) => {
             mood: { $ne: 'Journal Entry' }
         }).sort({ createdAt: -1 });
 
-        // Fetch user's name for personalization
         const user = await User.findById(req.userId).select('fullName');
         const userName = user ? user.fullName : 'User';
         
-        // Call the new AI function
         const insights = await generateDynamicInsightsAI(moodHistory, userName);
 
         if (!insights.hasData) { return res.status(200).json({ hasData: false }); }
@@ -437,7 +410,7 @@ app.get('/api/insights', authenticateUser, async (req, res) => {
 app.get('/api/profile/:userId', async (req, res) => {
     try {
         const user = await User.findById(req.params.userId).select('-password');
-        if (!user) { return res.status(404).json({ message: 'User not found' }); }
+        if (!user) { return res.status(404).json({ message: 'User not found.' }); }
         res.status(200).json(user);
     } catch (error) {
         if (error.name === 'CastError') { return res.status(400).json({ message: 'Invalid user ID format.' }); }
@@ -507,7 +480,7 @@ app.post('/api/support-circle', authenticateUser, async (req, res) => {
 
         res.status(200).json({ message: 'Contact added', supportCircle: user.supportCircle });
     } catch (error) {
-        if (error.name === 'ValidationError') { return res.status(400).json({ message: 'Validation failed: Contact name and email are required.' }); } // Updated error message
+        if (error.name === 'ValidationError') { return res.status(400).json({ message: 'Validation failed: Contact name and email are required.' }); }
         res.status(500).json({ message: 'Failed to add contact: Internal server error' });
     }
 });
@@ -521,7 +494,6 @@ app.put('/api/support-circle/:contactId', authenticateUser, async (req, res) => 
             return res.status(400).json({ message: 'Name and email are required.' });
         }
 
-        // Find user and update the specific contact
         const user = await User.findById(req.userId);
         if (!user) { return res.status(404).json({ message: 'User not found.' }); }
 
@@ -682,6 +654,7 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
                 unverifiedContacts.push(contact.name);
             }
             
+            // Send Email Notification
             const emailSent = await sendSupportEmail(contact.email, contact.name, user.fullName);
             
             contactReports.push({
@@ -689,17 +662,17 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
                 email: contact.email,
                 _id: contact._id,
                 emailVerified: isVerified,
-                deliveryStatus: emailSent ? 'SENT' : 'FAILED'
+                deliveryStatus: emailSent ? 'SENT' : 'FAILED',
             });
         }
         
-        const sentCount = contactReports.filter(r => r.deliveryStatus === 'SENT').length;
-        const failedCount = contactReports.filter(r => r.deliveryStatus === 'FAILED').length;
+        const sentEmailCount = contactReports.filter(r => r.deliveryStatus === 'SENT').length;
         
-        let message = `Emergency signal sent. ${sentCount} contact(s) notified via email.`;
+        let message = `Emergency signal sent. ${sentEmailCount} email(s) delivered.`;
         
-        if (failedCount > 0) {
-            message += ` ${failedCount} email(s) failed to send.`;
+        const failedEmailCount = contactReports.filter(r => r.deliveryStatus === 'FAILED').length;
+        if (failedEmailCount > 0) {
+            message += ` ${failedEmailCount} email(s) failed to send.`;
         }
         
         if (unverifiedCount > 0) {
@@ -708,7 +681,7 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
 
         res.status(200).json({ 
             message: message,
-            contactReports: contactReports, // Renamed to contactReports for clarity
+            contactReports: contactReports,
             unverifiedContacts: unverifiedContacts
         });
 

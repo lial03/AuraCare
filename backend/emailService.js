@@ -4,13 +4,12 @@ require('dotenv').config();
 // Create a transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
     host: 'smtp.mailgun.org', 
-    port: 2525, // Changed to 2525 as a last resort
+    port: 2525, // Changed to 2525 
     secure: false, // Use STARTTLS
     auth: {
         user: process.env.MAILGUN_SMTP_LOGIN, 
         pass: process.env.MAILGUN_SMTP_PASSWORD
     },
-    // Additional settings to improve deliverability
     tls: {
         rejectUnauthorized: true,
         minVersion: 'TLSv1.2'
@@ -19,14 +18,13 @@ const transporter = nodemailer.createTransport({
 
 /**
  * Sends an email notification to a support contact.
- * Enhanced with better deliverability practices to avoid spam filters.
  * @param {string} recipientEmail - The email address of the support contact.
  * @param {string} recipientName - The name of the support contact.
  * @param {string} userName - The name of the user who needs support.
  */
 const sendSupportEmail = async (recipientEmail, recipientName, userName) => {
     const mailOptions = {
-        from: `"AuraCare Support Alert" <${process.env.MAILGUN_SENDER_EMAIL}>`, // Friendly name with email
+        from: `"AuraCare Support Alert" <${process.env.MAILGUN_SENDER_EMAIL}>`,
         to: recipientEmail,
         replyTo: process.env.MAILGUN_SENDER_EMAIL, // Set reply-to address
         subject: `URGENT: ${userName} Needs Your Support - AuraCare Alert`,

@@ -18,7 +18,6 @@ const SupportCircle = () => {
   // --- NEW STATE FOR AI FEATURE ---
   const [communicationScript, setCommunicationScript] = useState('');
   const [isGeneratingScript, setIsGeneratingScript] = useState(false);
-  // --- END NEW STATE ---
 
   const userId = localStorage.getItem('currentUserId'); 
   const token = localStorage.getItem('authToken');
@@ -239,7 +238,7 @@ const SupportCircle = () => {
     }
   };
   
-  // --- NEW HANDLER FOR AI SCRIPT ---
+  // --- HANDLER FOR AI SCRIPT ---
   const handleGenerateScript = async () => {
     if (!token) {
         alert('Session expired. Please log in.');
@@ -268,7 +267,6 @@ const SupportCircle = () => {
         setIsGeneratingScript(false);
     }
   };
-  // --- END NEW HANDLER ---
 
   return (
     <div className="support-circle-container">
@@ -279,7 +277,7 @@ const SupportCircle = () => {
         Add trusted contacts who will be notified when you need support
       </p>
 
-      {/* --- NEW AI PROACTIVE CHECK-IN CARD --- */}
+      {/* --- AI PROACTIVE CHECK-IN CARD --- */}
       <div className="content-card" style={{ backgroundColor: '#FFF7E6', borderLeft: '5px solid #FFA500' }}>
         <h2 className="section-heading" style={{ marginTop: '0', color: '#FFA500' }}>💡 Proactive Check-in</h2>
         <p style={{ fontSize: '14px', color: '#6B6B6B', marginBottom: '15px' }}>
@@ -329,7 +327,6 @@ const SupportCircle = () => {
             </button>
         )}
       </div>
-      {/* --- END AI PROACTIVE CHECK-IN CARD --- */}
 
       <div className="content-card">
         <h2 className="section-heading">Your Contacts</h2>
