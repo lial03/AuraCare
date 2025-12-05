@@ -8,10 +8,10 @@ require('dotenv').config();
 
 const { sendSupportEmail } = require('./emailService'); // Import email service
 
-// --- AI SDK Setup ---
+// --- NEW: AI SDK Setup ---
 const { GoogleGenAI } = require('@google/genai');
 const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY }); 
-
+// --- END NEW: AI SDK Setup ---
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -89,6 +89,7 @@ const formatHistoryForLLM = (moodHistory) => {
  * Uses the Gemini API to generate personalized, dynamic insights.
  */
 const generateDynamicInsightsAI = async (moodHistory, userName) => {
+    // Require at least 3 data points for meaningful analysis
     if (moodHistory.length < 3) {
         return { hasData: false };
     }
@@ -154,6 +155,7 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
         };
     }
 };
+// --- END AI Insight Generation Logic (Dashboard) ---
 
 
 // --- AI Insight Generation Logic (Journal Analysis) ---
@@ -210,6 +212,52 @@ const analyzeJournalEntryAI = async (notes) => {
     }
 };
 
+// --- END AI Insight Generation Logic (Journal Analysis) ---
+
+// --- NEW: AI Insight Generation Logic (Communication Script) ---
+
+/**
+ * Uses the Gemini API to generate a personalized, low-stakes communication script.
+ */
+const generateScriptAI = async (userName, moodHistory) => {
+    // We use mood history to provide context to the AI for a better script
+    const historyPrompt = moodHistory.length > 0 ? formatHistoryForLLM(moodHistory) : "No recent mood data logged.";
+    
+    const prompt = `
+        You are a supportive, friendly AI. Generate a single, short, casual text message script that the user, ${userName}, can copy and send to a trusted contact to maintain their relationship and check in, without making a crisis alert.
+
+        Base the message on the user's recent history, or just a friendly generic check-in if the data is too complex. 
+
+        Recent History:
+        ---
+        ${historyPrompt}
+        ---
+
+        The script should be one or two short sentences and MUST substitute "[Contact's Name]" where appropriate.
+        
+        Example Output: "Hey [Contact's Name], just checking in. I was thinking about our conversation the other day and wanted to see how you were doing!"
+
+        Return only the text message content as a simple string, with no JSON, quotes, or conversational preamble.
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                temperature: 0.8,
+            }
+        });
+        
+        // The API returns the text string directly
+        return response.text;
+
+    } catch (error) {
+        console.error("Script Generation Failed:", error.message); 
+        return "Hey [Contact's Name], just thinking of you today! Hope you're doing well.";
+    }
+};
+// --- END NEW: AI Insight Generation Logic (Communication Script) ---
 
 const authenticateUser = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -341,6 +389,26 @@ app.post('/api/analyze-journal', authenticateUser, async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: 'Failed to analyze journal entry.', error: error.message });
+    }
+});
+
+app.get('/api/generate-script', authenticateUser, async (req, res) => {
+    try {
+        const moodHistory = await MoodLog.find({ 
+            userId: req.userId,
+            mood: { $ne: 'Journal Entry' }
+        }).sort({ createdAt: -1 }).limit(7);
+
+        const user = await User.findById(req.userId).select('fullName');
+        const userName = user ? user.fullName : 'User';
+        
+        const script = await generateScriptAI(userName, moodHistory);
+
+        res.status(200).json({ script: script });
+
+    } catch (error) {
+        console.error('Failed to generate script:', error);
+        res.status(500).json({ message: 'Failed to generate communication script.', error: error.message });
     }
 });
 

@@ -14,6 +14,11 @@ const SupportCircle = () => {
   const [userName, setUserName] = useState('User');
   const [editingContactId, setEditingContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({ name: '', email: '' });
+  
+  // --- NEW STATE FOR AI FEATURE ---
+  const [communicationScript, setCommunicationScript] = useState('');
+  const [isGeneratingScript, setIsGeneratingScript] = useState(false);
+  // --- END NEW STATE ---
 
   const userId = localStorage.getItem('currentUserId'); 
   const token = localStorage.getItem('authToken');
@@ -233,6 +238,37 @@ const SupportCircle = () => {
         alert('Could not connect to the server.');
     }
   };
+  
+  // --- NEW HANDLER FOR AI SCRIPT ---
+  const handleGenerateScript = async () => {
+    if (!token) {
+        alert('Session expired. Please log in.');
+        navigate('/login');
+        return;
+    }
+    
+    setIsGeneratingScript(true);
+    setCommunicationScript('');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/generate-script`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            setCommunicationScript(data.script);
+        } else {
+            alert(`Failed to generate script: ${data.message || 'Server error'}`);
+        }
+    } catch (error) {
+        alert('Could not connect to the server.');
+    } finally {
+        setIsGeneratingScript(false);
+    }
+  };
+  // --- END NEW HANDLER ---
 
   return (
     <div className="support-circle-container">
@@ -242,6 +278,58 @@ const SupportCircle = () => {
       <p className="page-subtitle">
         Add trusted contacts who will be notified when you need support
       </p>
+
+      {/* --- NEW AI PROACTIVE CHECK-IN CARD --- */}
+      <div className="content-card" style={{ backgroundColor: '#FFF7E6', borderLeft: '5px solid #FFA500' }}>
+        <h2 className="section-heading" style={{ marginTop: '0', color: '#FFA500' }}>💡 Proactive Check-in</h2>
+        <p style={{ fontSize: '14px', color: '#6B6B6B', marginBottom: '15px' }}>
+          Use AI to generate a low-pressure, friendly message to send to a contact and maintain your social connections, even when you feel okay.
+        </p>
+
+        {communicationScript ? (
+            <>
+                <p style={{ 
+                    fontSize: '16px', 
+                    color: '#2D2D2D', 
+                    padding: '15px', 
+                    backgroundColor: '#F8F8F8', 
+                    borderRadius: '8px', 
+                    border: '1px dashed #C4B0E8', 
+                    whiteSpace: 'pre-wrap'
+                }}>
+                    {communicationScript}
+                </p>
+                <button 
+                    onClick={() => { navigator.clipboard.writeText(communicationScript); alert('Message copied to clipboard!'); }}
+                    className="btn-secondary"
+                    style={{ marginTop: '10px', height: '40px', maxWidth: '200px' }}
+                >
+                    📋 Copy to Clipboard
+                </button>
+                <button 
+                    onClick={() => setCommunicationScript('')}
+                    className="btn-secondary"
+                    style={{ marginTop: '10px', height: '40px', maxWidth: '200px', marginLeft: '10px' }}
+                >
+                    Generate New Script
+                </button>
+            </>
+        ) : (
+            <button 
+                className="btn-primary" 
+                onClick={handleGenerateScript}
+                style={{ 
+                    backgroundColor: '#A06FC7',
+                    height: '45px', 
+                    boxShadow: 'none'
+                }}
+                disabled={isGeneratingScript}
+            >
+                {isGeneratingScript ? 'Generating Script...' : 'Generate Check-In Script'}
+            </button>
+        )}
+      </div>
+      {/* --- END AI PROACTIVE CHECK-IN CARD --- */}
 
       <div className="content-card">
         <h2 className="section-heading">Your Contacts</h2>
