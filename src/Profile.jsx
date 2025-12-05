@@ -118,7 +118,7 @@ const Profile = () => {
                     <Link to="/notifications" className="settings-link"><div className="settings-item"><span className="item-icon">🔔</span><span className="item-text">Notifications</span><span className="arrow-icon">›</span></div></Link>
                     <Link to="/support-circle" className="settings-link"><div className="settings-item"><span className="item-icon">👥</span><span className="item-text">My Support Circle</span><span className="arrow-icon">›</span></div></Link>
                     <Link to="/privacy" className="settings-link"><div className="settings-item"><span className="item-icon">🔒</span><span className="item-text">Privacy & Security</span><span className="arrow-icon">›</span></div></Link>
-                    <Link to="/support-circle" className="settings-link"><div className="settings-item"><span className="item-icon">🆘</span><span className="item-text">Emergency Contacts</span><span className="arrow-icon">›</span></div></Link>
+                    <Link to="/resources" className="settings-link"><div className="settings-item"><span className="item-icon">🆘</span><span className="item-text">Crisis Helplines</span><span className="arrow-icon">›</span></div></Link>
                 </div>
             )}
             

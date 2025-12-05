@@ -158,12 +158,13 @@ const Resources = () => {
               <span className="booster-icon">🌿</span> 5-Minute Breathing Exercise
             </button>
           </Link>
-          <a href="https://www.youtube.com/watch?v=tck7E11SdR8" target="_blank" rel="noopener noreferrer" className="booster-link">
+          {/* FIX APPLIED: Changed <a> to <Link> pointing to the internal Music component route */}
+          <Link to="/resources/music" className="booster-link">
             {/* Apply highlight style if AI recommends 'music' */}
             <button className="booster-button music" style={getHighlightStyle('music')}>
               <span className="booster-icon">🎵</span> Calming Music Playlist
             </button>
-          </a>
+          </Link>
           <Link to="/resources/journaling" className="booster-link">
             {/* Apply highlight style if AI recommends 'journaling' */}
             <button className="booster-button journaling" style={getHighlightStyle('journaling')}>
