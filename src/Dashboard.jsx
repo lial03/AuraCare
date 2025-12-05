@@ -211,31 +211,53 @@ const Dashboard = () => {
         {renderMoodChart()}
       </div>
       
+      {/* Renders Insights ONLY if there is enough data */}
       {hasEnoughData && insights && insights.hasData && (
-        <div className="insights-container">
+        <div className="insights-container" style={{ marginBottom: '40px' }}>
           <div className="insight-card-1">
             <span className="insight-icon">📈</span>
             <p className="insight-text">
-              <span className="bold-label">Mood Status:</span> {/* Dynamic Title 1 */}
+              <span className="bold-label">Mood Status:</span>
               <br/>
               {insights.insightText}
             </p>
           </div>
 
           <div className="insight-card-2">
-            <span className="insight-icon">😜</span>
+            <span className="insight-icon">🎯</span>
             <p className="insight-text">
-              <span className="bold-label">Actionable Insight:</span> {/* Dynamic Title 2 */}
+              <span className="bold-label">Actionable Insight:</span>
               <br/>
               {insights.patternText}
             </p>
           </div>
+          
+          {/* NEW: Dynamic Action Button */}
+          {insights.actionLink && (
+            <Link to={insights.actionLink} className="support-button-link"> 
+                <button 
+                    className="support-button" 
+                    style={{ 
+                        backgroundColor: '#8B5FBF', // Use the main theme color for this action
+                        boxShadow: '0 6px 18px rgba(139, 95, 191, 0.5)',
+                        marginTop: '15px'
+                    }}
+                >
+                    Take Action Now »
+                </button>
+            </Link>
+          )}
+          {/* END NEW: Dynamic Action Button */}
         </div>
       )}
       
-      <div className="support-button-link"> 
-        <button className="support-button" onClick={handleSupportSignal}>
-          I Need Support Now
+      {/* Move the I Need Support Now button below the dynamic actions */}
+      <div className="support-button-link" style={{ marginBottom: '40px', marginTop: hasEnoughData ? '0' : '20px' }}> 
+        <button className="support-button" onClick={handleSupportSignal} style={{ 
+          backgroundColor: '#FF6B8B', 
+          boxShadow: '0 6px 18px rgba(255, 107, 139, 0.5)' 
+        }}>
+          🚨 I Need Support Now
         </button>
       </div>
 

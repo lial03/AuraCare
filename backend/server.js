@@ -8,10 +8,10 @@ require('dotenv').config();
 
 const { sendSupportEmail } = require('./emailService'); // Import email service
 
-// --- NEW: AI SDK Setup ---
+// --- AI SDK Setup ---
 const { GoogleGenAI } = require('@google/genai');
 const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY }); 
-// --- END NEW: AI SDK Setup ---
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -77,8 +77,9 @@ const MoodLogSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const MoodLog = mongoose.model('MoodLog', MoodLogSchema);
 
-// --- AI Insight Generation Logic ---
+// --- AI Insight Generation Logic (Dashboard) ---
 const formatHistoryForLLM = (moodHistory) => {
+    // We send the last 7 mood entries with notes
     return moodHistory.slice(0, 7).map(entry => 
         `Mood: ${entry.mood}, Notes: "${entry.notes || 'No notes provided.'}", Date: ${new Date(entry.createdAt).toDateString()}`
     ).join('\n');
@@ -88,7 +89,6 @@ const formatHistoryForLLM = (moodHistory) => {
  * Uses the Gemini API to generate personalized, dynamic insights.
  */
 const generateDynamicInsightsAI = async (moodHistory, userName) => {
-    // Require at least 3 data points for meaningful analysis
     if (moodHistory.length < 3) {
         return { hasData: false };
     }
@@ -100,9 +100,10 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
         type: "object",
         properties: {
             insightText: { type: "string", description: "A concise 1-2 sentence summary of the user's current mood trend or status." },
-            patternText: { type: "string", description: "A personalized, actionable, and encouraging recommendation based on the history." }
+            patternText: { type: "string", description: "A personalized, actionable, and encouraging recommendation based on the history." },
+            actionLink: { type: "string", description: "The most relevant internal link for immediate action. Must be one of: /breathing-exercise, /resources/journaling, or /support-circle." }
         },
-        required: ["insightText", "patternText"]
+        required: ["insightText", "patternText", "actionLink"]
     };
 
     const prompt = `
@@ -117,6 +118,7 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
         1. Identify the most significant recent trend (e.g., downward, upward, stable) or a recurring potential trigger found in the notes.
         2. Generate a concise "Mood Status" summary (insightText).
         3. Generate a personalized, actionable recommendation (patternText).
+        4. Based on the pattern, select the single best resource link from the following choices: /breathing-exercise (for anxiety/stress), /resources/journaling (for complex emotions/reflection), or /support-circle (for isolation/low mood requiring contact). 
         
         The final response MUST be a valid JSON object matching the requested schema.
     `;
@@ -137,7 +139,8 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
         return { 
             hasData: true, 
             insightText: insights.insightText, 
-            patternText: insights.patternText 
+            patternText: insights.patternText,
+            actionLink: insights.actionLink // Pass the new link to the frontend
         };
 
     } catch (error) {
@@ -146,7 +149,8 @@ const generateDynamicInsightsAI = async (moodHistory, userName) => {
         return { 
             hasData: true, 
             insightText: "An AI check-in failed, but your data is safe. 🥺", 
-            patternText: "Keep logging your moods and notes—you're doing great just by checking in." 
+            patternText: "Keep logging your moods and notes—you're doing great just by checking in.",
+            actionLink: "/resources" // Fallback to the main resources page
         };
     }
 };
@@ -636,7 +640,7 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
 
         res.status(200).json({ 
             message: message,
-            contactReports: contactReports,
+            contactReports: contactReports, // Renamed to contactReports for clarity
             unverifiedContacts: unverifiedContacts
         });
 
