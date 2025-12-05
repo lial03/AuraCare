@@ -113,6 +113,31 @@ const SupportCircle = () => {
     }
   };
 
+  const handleVerify = async (contactId) => {
+        const token = localStorage.getItem('authToken');
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/support-circle/${contactId}/verify`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSupportCircle(data.supportCircle);
+                alert(data.message);
+            } else {
+                alert(`Failed to verify contact: ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Verification error:', error);
+            alert('An error occurred during verification.');
+        }
+    };
+
   const handleDeleteContact = async (contactId) => {
     if (!token) {
         alert('Session expired. Please log in.');
@@ -316,7 +341,26 @@ const SupportCircle = () => {
                                         </span>
                                     )}
                                 </div>
-                                <div style={{ display: 'flex', gap: '10px' }}>
+                                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                    {!contact.emailVerified && (
+                                        <button 
+                                            className="verify-button" 
+                                            onClick={() => handleVerify(contact._id)}
+                                            style={{ 
+                                                backgroundColor: '#007bff', 
+                                                color: 'white', 
+                                                border: 'none', 
+                                                padding: '6px 12px', 
+                                                borderRadius: '6px', 
+                                                cursor: 'pointer',
+                                                fontSize: '14px',
+                                                fontWeight: '600',
+                                                marginRight: '10px'
+                                            }}
+                                        >
+                                            Mark as Verified
+                                        </button>
+                                    )}
                                     <button 
                                         className="edit-contact-button" 
                                         onClick={() => handleEditClick(contact)}

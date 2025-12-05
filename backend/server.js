@@ -12,9 +12,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS Configuration
-const allowedOrigin = 'https://auracare-kappa.vercel.app';
+const allowedOrigins = [
+    'https://auracare-kappa.vercel.app'
+];
+
 const corsOptions = {
-    origin: allowedOrigin,
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204
@@ -360,6 +371,31 @@ app.put('/api/profile', authenticateUser, async (req, res) => {
     }
 });
 
+// Endpoint to manually mark a contact's email as verified
+app.put('/api/support-circle/:contactId/verify', authenticateUser, async (req, res) => {
+    try {
+        const { contactId } = req.params;
+        
+        const updatedUser = await User.findOneAndUpdate(
+            { "_id": req.userId, "supportCircle._id": contactId },
+            { "$set": { "supportCircle.$.emailVerified": true } },
+            { new: true }
+        ).select('supportCircle');
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User or contact not found.' });
+        }
+
+        res.status(200).json({ 
+            message: 'Contact email marked as verified successfully.',
+            supportCircle: updatedUser.supportCircle 
+        });
+    } catch (error) {
+        console.error('Error verifying contact email:', error);
+        res.status(500).json({ message: 'Failed to verify contact email: Internal server error', error: error.message });
+    }
+});
+
 app.post('/api/support-circle', authenticateUser, async (req, res) => {
     try {
         const { name, email } = req.body;
@@ -537,33 +573,35 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
             return res.status(400).json({ message: 'No contacts in support circle to notify.' });
         }
         
-        let sentCount = 0;
-        let failedCount = 0;
+        const contactReports = [];
         let unverifiedCount = 0;
         const unverifiedContacts = [];
         
         for (const contact of user.supportCircle) {
-            // Check if email is verified (for now, we'll send to all but track unverified)
-            // In production, you might want to skip unverified emails
-            if (!contact.emailVerified) {
+            const isVerified = contact.emailVerified || false;
+            if (!isVerified) {
                 unverifiedCount++;
                 unverifiedContacts.push(contact.name);
             }
             
             const emailSent = await sendSupportEmail(contact.email, contact.name, user.fullName);
             
-            if (emailSent) {
-                sentCount++;
-            } else {
-                failedCount++;
-            }
+            contactReports.push({
+                name: contact.name,
+                email: contact.email,
+                _id: contact._id,
+                emailVerified: isVerified,
+                deliveryStatus: emailSent ? 'SENT' : 'FAILED'
+            });
         }
         
-        let message = '';
+        const sentCount = contactReports.filter(r => r.deliveryStatus === 'SENT').length;
+        const failedCount = contactReports.filter(r => r.deliveryStatus === 'FAILED').length;
+        
+        let message = `Emergency signal sent. ${sentCount} contact(s) notified via email.`;
+        
         if (failedCount > 0) {
-            message = `Emergency signal sent. ${sentCount} contact(s) notified via email. ${failedCount} email(s) failed to send.`;
-        } else {
-            message = `Emergency signal sent. ${sentCount} contact(s) notified via email.`;
+            message += ` ${failedCount} email(s) failed to send.`;
         }
         
         if (unverifiedCount > 0) {
@@ -572,12 +610,7 @@ app.post('/api/need-support', authenticateUser, async (req, res) => {
 
         res.status(200).json({ 
             message: message,
-            notifiedContacts: user.supportCircle.map(c => ({ 
-                name: c.name, 
-                email: c.email, 
-                _id: c._id,
-                emailVerified: c.emailVerified || false
-            })),
+            contactReports: contactReports, // Renamed to contactReports for clarity
             unverifiedContacts: unverifiedContacts
         });
 
