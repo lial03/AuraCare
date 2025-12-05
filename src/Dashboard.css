@@ -7,6 +7,16 @@
   box-sizing: border-box;
 }
 
+/* Ensure consistent page layout */
+.page-container {
+  min-height: 100vh;
+  background-color: #F3EBFF;
+  padding: 20px;
+  padding-bottom: 80px;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+
 /* --- Header --- */
 .app-header {
   display: flex;

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './MoodLog.css';
+import './PageLayout.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -8,6 +9,30 @@ const MoodLog = () => {
     const navigate = useNavigate();
     const [selectedMood, setSelectedMood] = useState('');
     const [notes, setNotes] = useState('');
+    const [userName, setUserName] = useState('User');
+
+    useEffect(() => {
+        const fetchUserName = async () => {
+            const userId = localStorage.getItem('currentUserId');
+            const token = localStorage.getItem('authToken');
+            
+            if (!userId || !token) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setUserName(data.fullName || 'User');
+                }
+            } catch (error) {
+                console.error('Error fetching user name:', error);
+            }
+        };
+        
+        fetchUserName();
+    }, []);
 
     const moodOptions = [
         { emoji: '😬', label: 'Terrible' }, 
@@ -18,7 +43,6 @@ const MoodLog = () => {
         { emoji: '☯️', label: 'Mixed' },
     ];
     
-    // --- Handle Mood Selection with Guided Prompt ---
     const handleSelectMood = (label) => {
         setSelectedMood(label);
         
@@ -42,7 +66,6 @@ const MoodLog = () => {
             return;
         }
         
-        // Determine if it should be saved as a Journal Entry
         const moodToSave = selectedMood === 'Mixed' ? 'Journal Entry' : selectedMood;
 
         try {
@@ -58,7 +81,6 @@ const MoodLog = () => {
             if (response.ok) {
                 alert('Mood logged successfully!');
                 
-                // If it was a Mixed entry, guide them toward reflection
                 if (selectedMood === 'Mixed') {
                     navigate('/resources/journaling');
                 } else {
@@ -74,13 +96,10 @@ const MoodLog = () => {
 
     return (
         <div className="mood-log-container">
-            <header className="log-header">
-                <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', lineHeight: '1', position: 'absolute', left: '20px' }}>
-                    « Back
-                </Link>
-                <h1 className="log-title">How are you feeling today?</h1>
-                <div className="time-avatar">L</div> 
-            </header>
+            <Link to="/dashboard" className="back-button-link">« Back to Dashboard</Link>
+            <h1 className="page-title" style={{ marginBottom: '30px', textAlign: 'center' }}>
+                How are you feeling today?
+            </h1>
 
             <div className="mood-selection-section">
                 <p className="section-prompt">Select your current mood:</p>
@@ -89,7 +108,7 @@ const MoodLog = () => {
                         <div 
                             key={mood.label} 
                             className={`mood-option ${selectedMood === mood.label ? 'selected' : ''}`}
-                            onClick={() => handleSelectMood(mood.label)} // Use new handler
+                            onClick={() => handleSelectMood(mood.label)}
                         >
                             <span className="mood-icon">{mood.emoji}</span>
                             <span className="mood-label">{mood.label}</span>
@@ -99,6 +118,9 @@ const MoodLog = () => {
             </div>
 
             <div className="notes-section">
+                <p style={{ fontSize: '14px', color: '#6B6B6B', marginBottom: '10px' }}>
+                    {selectedMood === 'Mixed' ? 'Use the prompt above to guide your thoughts.' : 'Add any notes (optional)'}
+                </p>
                 <textarea
                     className="mood-notes-textarea"
                     placeholder={selectedMood === 'Mixed' ? "Use the prompt above to guide your thoughts." : "Any notes? (Optional)"} 
@@ -108,10 +130,13 @@ const MoodLog = () => {
                 ></textarea>
             </div>
             
-            <div className="action-button-group">
-                <button className="log-mood-button" onClick={handleSave}>
+            <div className="button-group">
+                <button className="btn-primary" onClick={handleSave}>
                     {selectedMood === 'Mixed' ? "Save Reflection" : "Save How I Feel"}
                 </button>
+                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                    <button className="btn-secondary">Cancel</button>
+                </Link>
             </div>
         </div>
     );

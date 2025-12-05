@@ -2,6 +2,7 @@
     min-height: 100vh;
     background-color: #F3EBFF; 
     padding: 20px;
+    padding-bottom: 80px;
     font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
@@ -32,10 +33,11 @@
 }
 
 .exercise-description {
-    font-size: 17px;
+    font-size: 16px;
     color: #6B6B6B;
     max-width: 350px;
-    margin-bottom: 60px; 
+    margin-bottom: 40px;
+    line-height: 1.5;
 }
 
 /* --- Breathing Circle Styles --- */

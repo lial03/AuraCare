@@ -1,19 +1,43 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import './PageLayout.css';
 import './Resources.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const Resources = () => {
+  const [userName, setUserName] = useState('User');
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const userId = localStorage.getItem('currentUserId');
+      const token = localStorage.getItem('authToken');
+      
+      if (!userId || !token) return;
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setUserName(data.fullName || 'User');
+        }
+      } catch (error) {
+        console.error('Error fetching user name:', error);
+      }
+    };
+    
+    fetchUserName();
+  }, []);
+
   return (
     <div className="resources-container">
-      <div className="app-header">
-        <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', lineHeight: '1', position: 'absolute', left: '20px' }}>
-            « Back
-        </Link>
-        <h1 className="screen-title">Well-being Resources</h1>
-        <div className="time-avatar">L</div> 
-      </div>
+      <Link to="/dashboard" className="back-button-link">« Back to Dashboard</Link>
+      <h1 className="page-title">💡 Well-being Resources</h1>
 
       <div className="section-group">
-        <h2 className="section-title">Immediate Help</h2>
+        <h2 className="section-heading">Immediate Help</h2>
         <div className="immediate-help-card">
           <p className="helpline-number">Crisis Helpline: 1-800-273-8255</p>
           <p className="helpline-note">Available 24/7 - You're not alone</p>
@@ -21,7 +45,7 @@ const Resources = () => {
       </div>
 
       <div className="section-group">
-        <h2 className="section-title">Quick Mood Boosters</h2>
+        <h2 className="section-heading">Quick Mood Boosters</h2>
         <div className="mood-booster-list">
           <Link to="/breathing-exercise" className="booster-link">
             <button className="booster-button breathing">
@@ -42,20 +66,42 @@ const Resources = () => {
       </div>
 
       <div className="section-group">
-        <h2 className="section-title">Educational Resources</h2>
+        <h2 className="section-heading">Educational Resources</h2>
         <p className="learn-more">Learn More</p>
         <div className="educational-list">
-          <a href="https://www.nimh.nih.gov/health/topics/child-and-adolescent-mental-health" target="_blank" rel="noopener noreferrer" className="booster-link">
+          <Link to="/resources/mental-health" className="booster-link">
             <button className="edu-button mental-health">
               <span className="edu-icon">📚</span> Understanding Mental Health
             </button>
-          </a>
-          <a href="https://jedfoundation.org/how-to-build-resilience-in-teens-and-young-adults/" target="_blank" rel="noopener noreferrer" className="booster-link">
+          </Link>
+          <Link to="/resources/resilience" className="booster-link">
             <button className="edu-button resilience">
               <span className="edu-icon">🎯</span> Building Resilience
             </button>
-          </a>
+          </Link>
         </div>
+      </div>
+
+      <div className="section-group">
+        <h2 className="section-heading">Your Wellness Journey</h2>
+        <div className="mood-booster-list">
+          <Link to="/journal-history" className="booster-link">
+            <button className="booster-button journaling">
+              <span className="booster-icon">📝</span> View Journal History
+            </button>
+          </Link>
+          <Link to="/mood-history" className="booster-link">
+            <button className="booster-button music">
+              <span className="booster-icon">📊</span> View Mood History
+            </button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="button-group">
+        <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+          <button className="btn-secondary">Back to Dashboard</button>
+        </Link>
       </div>
     </div>
   );

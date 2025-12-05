@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import './PageLayout.css';
 import './Profile.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
@@ -87,10 +88,8 @@ const Profile = () => {
 
     return (
         <div className="profile-container">
-            <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', marginBottom: '30px', display: 'block' }}>
-                « Back to Dashboard
-            </Link>
-            <h1 className="screen-title">My Profile</h1>
+            <Link to="/dashboard" className="back-button-link">« Back to Dashboard</Link>
+            <h1 className="page-title">⚙️ My Profile</h1>
 
             {isEditing ? (
                 <form className="user-info-card edit-mode" onSubmit={handleUpdateSubmit}>

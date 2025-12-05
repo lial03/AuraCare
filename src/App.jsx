@@ -10,7 +10,9 @@ import MentalHealth from './MentalHealth';
 import MoodHistoryPage from './MoodHistoryPage';
 import MoodLog from './MoodLog';
 import Music from './Music';
+import NotificationSettings from './NotificationSettings';
 import Onboarding from './Onboarding';
+import PrivacySettings from './PrivacySettings';
 import PrivateRoute from './PrivateRoute';
 import Profile from './Profile';
 import Resilience from './Resilience';
@@ -43,8 +45,8 @@ const AppRoutes = () => {
                 <Route path="/journal-history" element={<JournalHistory />} />
                 <Route path="/mood-history" element={<MoodHistoryPage />} />
                 
-                <Route path="/notifications" element={<h1>Notifications Setting</h1>} />
-                <Route path="/privacy" element={<h1>Privacy & Security Setting</h1>} />
+                <Route path="/notifications" element={<NotificationSettings />} />
+                <Route path="/privacy" element={<PrivacySettings />} />
             </Route>
         </Routes>
     );

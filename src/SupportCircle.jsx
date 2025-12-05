@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import './PageLayout.css';
 import './SupportCircle.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'; // ADDED
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const SupportCircle = () => {
   const navigate = useNavigate();
@@ -10,9 +11,30 @@ const SupportCircle = () => {
   const [contactEmail, setContactEmail] = useState(''); 
   const [supportCircle, setSupportCircle] = useState([]); 
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('User');
 
   const userId = localStorage.getItem('currentUserId'); 
   const token = localStorage.getItem('authToken');
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (!userId || !token) return;
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setUserName(data.fullName || 'User');
+        }
+      } catch (error) {
+        console.error('Error fetching user name:', error);
+      }
+    };
+    
+    fetchUserName();
+  }, [userId, token]);
 
   const fetchSupportCircle = async () => {
     if (!userId || !token) {
@@ -21,7 +43,7 @@ const SupportCircle = () => {
     }
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, { // MODIFIED
+      const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, {
           headers: {
               'Authorization': `Bearer ${token}` 
           }
@@ -55,7 +77,7 @@ const SupportCircle = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/support-circle`, { // MODIFIED
+      const response = await fetch(`${API_BASE_URL}/api/support-circle`, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -94,7 +116,7 @@ const SupportCircle = () => {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/support-circle/${contactId}`, { // MODIFIED
+        const response = await fetch(`${API_BASE_URL}/api/support-circle/${contactId}`, {
             method: 'DELETE',
             headers: { 
                 'Authorization': `Bearer ${token}` 
@@ -117,71 +139,74 @@ const SupportCircle = () => {
     }
   };
 
-
   return (
     <div className="support-circle-container">
-      <div className="app-header">
-        <Link to="/dashboard" style={{ textDecoration: 'none', color: '#8B5FBF', fontWeight: '600', fontSize: '16px', lineHeight: '1', position: 'absolute', left: '20px' }}>
-            « Back
-        </Link>
-        <h1 className="screen-title">My Support Circle</h1>
-        <div className="time-avatar">L</div> 
-      </div>
+      <Link to="/dashboard" className="back-button-link">« Back to Dashboard</Link>
+      <h1 className="page-title">👥 My Support Circle</h1>
 
-      <p className="screen-description">
+      <p className="page-subtitle">
         Add trusted contacts who will be notified when you need support
       </p>
 
-      <div className="contacts-list-placeholder">
+      <div className="content-card">
+        <h2 className="section-heading">Your Contacts</h2>
         {loading ? (
-            <p>Loading contacts...</p>
+            <p style={{ color: '#6B6B6B', textAlign: 'center' }}>Loading contacts...</p>
         ) : supportCircle.length > 0 ? (
             <div className="actual-contacts-list">
                 {supportCircle.map((contact) => (
                     <div key={contact._id} className="actual-contact-item">
-	                        <span className="contact-details">👥 {contact.name} - {contact.email}</span> 
-
+                        <span className="contact-details">👥 {contact.name} - {contact.email}</span> 
                         <button 
                             className="delete-contact-button" 
                             onClick={() => handleDeleteContact(contact._id)}
                             aria-label={`Remove ${contact.name}`}
+                            title="Remove contact"
                         >
-                            &times;
+                            ✕
                         </button>
                     </div>
                 ))}
             </div>
         ) : (
-            "No contacts added yet"
+            <div style={{ textAlign: 'center', padding: '20px', color: '#6B6B6B' }}>
+                No contacts added yet. Add your first contact below.
+            </div>
         )}
       </div>
 
-      <div className="contact-input-form">
-        <input 
-          type="text" 
-          placeholder="Contact Name" 
-          className="form-input-name"
-          value={contactName}
-          onChange={(e) => setContactName(e.target.value)}
-        />
-	        <input 
-	          type="email" 
-	          placeholder="Contact Email"
-	          className="form-input-email" 
-	          value={contactEmail}
-	          onChange={(e) => setContactEmail(e.target.value)} 
-	        />
-
-        
-        <button className="add-to-circle-button" onClick={handleAddContact}>
-          Add To My Circle
-        </button>
+      <div className="content-card">
+        <h2 className="section-heading">Add New Contact</h2>
+        <div className="contact-input-form">
+          <input 
+            type="text" 
+            placeholder="Contact Name" 
+            className="form-input-name"
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
+          />
+          <input 
+            type="email" 
+            placeholder="Contact Email"
+            className="form-input-email" 
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)} 
+          />
+          <button className="add-to-circle-button" onClick={handleAddContact}>
+            Add To My Circle
+          </button>
+        </div>
       </div>
 
-	      <p className="notification-note">
-	        These contacts will receive an **EMAIL** when you use 'I Need Support Now'
-	      </p>
+      <p className="notification-note">
+        💡 These contacts will receive an email when you use 'I Need Support Now'
+      </p>
 
+      <div className="button-group">
+        <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+          <button className="btn-secondary">Back to Dashboard</button>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './BreathingExercise.css';
+import './PageLayout.css';
 
 const BreathingExercise = () => {
   const [phase, setPhase] = useState('breathe in');
@@ -57,10 +58,14 @@ const BreathingExercise = () => {
 
   return (
     <div className="breathing-exercise-container">
-      <div className="back-link">
-        <Link to="/dashboard">« Back to Dashboard</Link>
-      </div>
+      <Link to="/dashboard" className="back-button-link" style={{ marginBottom: '20px' }}>
+        « Back to Dashboard
+      </Link>
       
+      <h1 className="page-title" style={{ marginBottom: '30px', textAlign: 'center' }}>
+        🌿 4-Count Breathing Exercise
+      </h1>
+
       <div className="breathing-display">
         <div className={`breathing-circle ${phase.replace(' ', '-')}`}>
           <p className="phase-label">{phaseText[phase]}</p>
@@ -68,15 +73,18 @@ const BreathingExercise = () => {
         </div>
       </div>
 
-      <h1 className="exercise-title">4-Count Breathing</h1>
       <p className="exercise-description">
-        Use this simple box breathing technique to quickly calm your nervous system.
-        Focus only on the countdown.
+        Use this simple box breathing technique to quickly calm your nervous system. Focus only on the countdown and follow your breath.
       </p>
 
-      <Link to="/log-mood" className="done-button-link">
-        <button className="done-button">I Feel Better Now</button>
-      </Link>
+      <div className="button-group" style={{ marginTop: '40px' }}>
+        <Link to="/log-mood" style={{ textDecoration: 'none' }}>
+          <button className="btn-primary">I Feel Better Now</button>
+        </Link>
+        <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+          <button className="btn-secondary">Back to Dashboard</button>
+        </Link>
+      </div>
     </div>
   );
 };

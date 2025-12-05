@@ -1,13 +1,36 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Dashboard.css';
+import './PageLayout.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const JournalHistory = () => {
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [userName, setUserName] = useState('User');
     const token = localStorage.getItem('authToken');
+
+    useEffect(() => {
+        const fetchUserName = async () => {
+            const userId = localStorage.getItem('currentUserId');
+            
+            if (!userId || !token) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/profile/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setUserName(data.fullName || 'User');
+                }
+            } catch (error) {
+                console.error('Error fetching user name:', error);
+            }
+        };
+        
+        fetchUserName();
+    }, [token]);
 
     const fetchJournalHistory = async () => {
         if (!token) {
@@ -63,71 +86,81 @@ const JournalHistory = () => {
         }
     };
 
-
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
     return (
-        <div className="dashboard-container">
-            <div className="app-header">
-                <h1 className="welcome-title">📓 Journal History</h1>
-                <div className="time-avatar">L</div> 
-            </div>
+        <div className="page-container">
+            <Link to="/resources" className="back-button-link">« Back to Resources</Link>
+            <h1 className="page-title">📓 Journal History</h1>
 
-            <Link to="/resources/journaling" style={{ marginBottom: '20px', display: 'block', color: '#8B5FBF', textDecoration: 'none', fontWeight: '600' }}>
-                « Write a New Entry
-            </Link>
+            <p className="page-subtitle">
+                View and manage your past journal entries
+            </p>
+
+            <div className="button-group" style={{ marginBottom: '30px' }}>
+                <Link to="/resources/journaling" style={{ textDecoration: 'none' }}>
+                    <button className="btn-primary">Write a New Entry</button>
+                </Link>
+            </div>
             
             {loading ? (
-                <p>Loading journal entries...</p>
+                <div className="content-card">
+                    <p style={{ textAlign: 'center', color: '#6B6B6B' }}>Loading journal entries...</p>
+                </div>
             ) : entries.length === 0 ? (
-                <div className="data-logged-card">
-                    <p>No journal entries found yet. Start writing!</p>
+                <div className="content-card" style={{ textAlign: 'center', padding: '40px 20px' }}>
+                    <div className="empty-state">
+                        <div className="empty-state-icon">📝</div>
+                        <p className="empty-state-text">No journal entries found yet. Start writing to begin your reflection journey!</p>
+                    </div>
                 </div>
             ) : (
                 <div className="journal-list" style={{ width: '100%' }}>
                     {entries.map((entry) => (
-                        <div key={entry._id} style={{ 
-                            backgroundColor: 'white', 
-                            padding: '15px', 
-                            borderRadius: '16px', 
-                            marginBottom: '15px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-                            position: 'relative'
-                        }}>
-                            <h3 style={{ fontSize: '14px', color: '#6B6B6B', marginBottom: '10px' }}>
-                                Saved on: {formatDate(entry.createdAt)}
+                        <div key={entry._id} className="content-card" style={{ position: 'relative', paddingRight: '50px' }}>
+                            <h3 style={{ fontSize: '14px', color: '#6B6B6B', marginBottom: '10px', marginTop: '0' }}>
+                                📅 {formatDate(entry.createdAt)}
                             </h3>
-                            <p style={{ whiteSpace: 'pre-wrap', fontSize: '16px', color: '#2D2D2D', lineHeight: '1.5', paddingRight: '40px' }}>
+                            <p style={{ whiteSpace: 'pre-wrap', fontSize: '16px', color: '#2D2D2D', lineHeight: '1.6', margin: '0' }}>
                                 {entry.notes}
                             </p>
                             <button
                                 onClick={() => handleDeleteEntry(entry._id)}
                                 style={{
                                     position: 'absolute',
-                                    top: '15px',
+                                    top: '20px',
                                     right: '15px',
                                     background: 'none',
                                     border: 'none',
                                     color: '#FF6B8B',
-                                    fontSize: '20px',
+                                    fontSize: '24px',
                                     cursor: 'pointer',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    padding: '0',
+                                    width: '30px',
+                                    height: '30px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
                                 }}
                                 aria-label="Delete entry"
+                                title="Delete entry"
                             >
-                                &times;
+                                ✕
                             </button>
                         </div>
                     ))}
                 </div>
             )}
 
-            <Link to="/dashboard" className="support-button-link" style={{ marginTop: '20px' }}>
-                <button className="support-button">Back to Dashboard</button>
-            </Link>
+            <div className="button-group" style={{ marginTop: '30px' }}>
+                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                    <button className="btn-secondary">Back to Dashboard</button>
+                </Link>
+            </div>
         </div>
     );
 };

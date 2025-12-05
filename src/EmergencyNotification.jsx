@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import './EmergencyNotification.css';
+import './PageLayout.css';
 
 const EmergencyNotification = () => {
   const location = useLocation();
-  const notifiedContacts = location.state?.notifiedContacts || []; 
-  // The backend now returns 'email' instead of 'phone' in the notifiedContacts array.
+  const notifiedContacts = location.state?.notifiedContacts || [];
   
   const getIcon = (name) => {
     if (name.toLowerCase().includes('mom') || name.toLowerCase().includes('dad') || name.toLowerCase().includes('parent')) return '👨‍👩‍👧‍👦';
@@ -13,13 +13,12 @@ const EmergencyNotification = () => {
 
   return (
     <div className="emergency-container">
-      <div className="app-header">
-        <h1 className="screen-title">Help is on the way 🚨</h1>
-        <div className="time-avatar">L</div> 
-      </div>
+      <h1 className="page-title" style={{ marginBottom: '10px', textAlign: 'center' }}>
+        🚨 Help is on the way
+      </h1>
 
       <p className="notification-subtitle">
-        We've notified your support circle ({notifiedContacts.length} contacts).
+        We've notified your support circle ({notifiedContacts.length} contact{notifiedContacts.length !== 1 ? 's' : ''}).
       </p>
 
       <div className="notified-card">
@@ -27,7 +26,6 @@ const EmergencyNotification = () => {
             notifiedContacts.map((contact, index) => (
               <div key={contact._id || index} className="contact-status">
                 <span className="contact-icon">{getIcon(contact.name)}</span>
-                {/* UPDATED: Display email here */}
                 <span className="contact-name">{contact.name} ({contact.email})</span> 
                 <span className="notification-status">
                   Notified 
@@ -49,11 +47,18 @@ const EmergencyNotification = () => {
         Your people will reach out soon. You're not alone in this.
       </p>
 
-      <Link to="/breathing-exercise" className="breathing-cta-link">
-        <button className="breathing-cta-button">
-          Try a Quick Breathing Exercise
-        </button>
-      </Link>
+      <div className="button-group">
+        <Link to="/breathing-exercise" style={{ textDecoration: 'none' }}>
+          <button className="btn-primary">
+            Try a Quick Breathing Exercise
+          </button>
+        </Link>
+        <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+          <button className="btn-secondary">
+            Back to Dashboard
+          </button>
+        </Link>
+      </div>
     </div>
   );
 };
